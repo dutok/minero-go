@@ -17,20 +17,13 @@ func TestString(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("WriteTo: % x", buf.Bytes())
-		t.Logf("WriteTo bytes written: %d", wn)
 
 		rn, err := mcs.ReadFrom(&buf)
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("ReadFrom: % x", buf.Bytes())
-		t.Logf("ReadFrom bytes read: %d", rn)
 
-		t.Logf("input string: %q", v)
-		t.Logf("output string: %q", mcs.String())
-
-		// Can't check string equality, quick generates weird
+		// Can't check string equality, quick may generate weird codepoints
 		return len(v) == len(mcs.String())
 		// return v == mcs.String()
 	}
