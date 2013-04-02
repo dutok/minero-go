@@ -3,107 +3,118 @@ package nbt
 import (
 	"fmt"
 	"io"
+
+	"github.com/toqueteos/minero/types"
 )
 
 // ByteArray holds a length-prefixed array of signed bytes. The prefix is a
 // signed integer (4 bytes).
 // TagType: 7, Size: 4 + elem * 1 bytes
-type ByteArray struct{ Value []byte }
+type ByteArray []types.Byte
 
-func (*ByteArray) Type() TagType          { return TagByteArray }
-func (*ByteArray) Lookup(path string) Tag { return nil }
+func (*ByteArray) Type() TagType             { return TagByteArray }
+func (b ByteArray) Size() int64              { return int64(4 + len(b)) }
+func (*ByteArray) Lookup(path string) Tagger { return nil }
 
-func (b *ByteArray) String() string {
+func (b ByteArray) String() string {
 	s := "NBT_ByteArray(size: %d) [% x, ... (%d elem(s) more)]"
-	return fmt.Sprintf(s, len(b.Value), b.Value[:StringNum], len(b.Value)-StringNum)
+	return fmt.Sprintf(s, len(b), b[:StringNum], len(b)-StringNum)
 }
 
-func (b *ByteArray) Read(reader io.Reader) (err error) {
+func (b *ByteArray) ReadFrom(reader io.Reader) (n int64, err error) {
 	var length Int
 
 	// Read length-prefix
-	err = length.Read(reader)
+	// _, err = length.ReadFrom(reader)
 	if err != nil {
 		return
 	}
 
 	// Read length bytes
-	arr := make([]byte, length.Value)
-	_, err = io.ReadFull(reader, arr)
-	if err != nil {
-		return
+	arr := make([]types.Byte, length.Int)
+	for _, elem := range arr {
+		_, err = elem.ReadFrom(reader)
+		if err != nil {
+			return
+		}
 	}
+	// _, err = io.Copy(b, reader)
 
-	b.Value = arr
+	*b = arr
 	return
 }
 
-func (b *ByteArray) Write(writer io.Writer) (err error) {
-	length := Int{int32(len(b.Value))}
+func (b *ByteArray) WriteTo(writer io.Writer) (n int64, err error) {
+	var length = types.Int(len(*b))
 
 	// Write length-prefix
-	if err = length.Write(writer); err != nil {
+	if _, err = length.WriteTo(writer); err != nil {
 		return
 	}
 
 	// Then write byte array
-	_, err = writer.Write(b.Value)
+	for _, elem := range *b {
+		_, err = elem.WriteTo(writer)
+		if err != nil {
+			return
+		}
+	}
+	// err = io.Copy(writer, b)
+
 	return
 }
 
 // IntArray holds a length-prefixed array of signed integers. The prefix is a
 // signed integer (4 bytes) and indicates the number of 4 byte integers.
 // TagType: 11, Size: 4 + 4 * elem
-type IntArray struct {
-	Value []Int
-}
+type IntArray []types.Int
 
-func (*IntArray) Type() TagType          { return TagIntArray }
-func (*IntArray) Lookup(path string) Tag { return nil }
-
-func (i *IntArray) String() string {
+func (*IntArray) Type() TagType             { return TagIntArray }
+func (i IntArray) Size() int64              { return int64(4 + len(i)) }
+func (*IntArray) Lookup(path string) Tagger { return nil }
+func (i IntArray) String() string {
 	var values []int32
-	for _, elem := range i.Value[:StringNum] {
-		values = append(values, elem.Value)
+	for _, elem := range i[:StringNum] {
+		values = append(values, int32(elem))
 	}
 
 	s := "NBT_IntArray(size: %d) [% d, ... (%d elem(s) more)]"
-	return fmt.Sprintf(s, len(i.Value), values, len(i.Value)-StringNum)
+	return fmt.Sprintf(s, len(i), values, len(i)-StringNum)
 }
 
-func (i *IntArray) Read(reader io.Reader) (err error) {
+func (i *IntArray) ReadFrom(reader io.Reader) (n int64, err error) {
 	var length Int
 
 	// Read length-prefix
-	err = length.Read(reader)
+	_, err = length.ReadFrom(reader)
 	if err != nil {
 		return
 	}
 
 	// Read length bytes
-	arr := make([]Int, length.Value)
+	arr := make([]types.Int, length.Int)
 	for _, elem := range arr {
-		err = elem.Read(reader)
+		_, err = elem.ReadFrom(reader)
 		if err != nil {
 			return
 		}
 	}
 
-	i.Value = arr
+	*i = arr
 	return
 }
 
-func (i *IntArray) Write(writer io.Writer) (err error) {
-	length := Int{int32(len(i.Value))}
+func (i *IntArray) WriteTo(writer io.Writer) (n int64, err error) {
+	length := types.Int(len(*i))
 
 	// Write length-prefix
-	if err = length.Write(writer); err != nil {
+	if _, err = length.WriteTo(writer); err != nil {
 		return
 	}
 
 	// Then write int array
-	for _, tag := range i.Value {
-		if err = tag.Write(writer); err != nil {
+	for _, tag := range *i {
+		if _, err = tag.WriteTo(writer); err != nil {
 			return
 		}
 	}

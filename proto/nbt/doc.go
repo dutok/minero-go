@@ -1,9 +1,7 @@
-// nbt provides the ability to read/write NBT data structures from Readers and
-// Writers.
+// Package nbt implements functions for the manipulation of NBT files.
 //
-// NBT is the data serialization format used in many places in the official
-// Notchian Minecraft server, typically to represent structured world, chunk
-// and player information.
+// Its based heavily onthe io.ReaderFrom and io.WriteTo interfaces, so you can
+// just use io.Copy to read and write NBT streams.
 //
 // An NBT data structure can be created with code such as the following:
 //
@@ -26,8 +24,6 @@
 //
 // It is required that the root structure be a Compound for compatibility with
 // existing NBT structures observed in the official server.
-//
-// NBT structures can be read from an io.Reader with the Read function.
 //
 // Many thanks to #mcdevs from Freenode and it's great documentation:
 // http://wiki.vg/NBT

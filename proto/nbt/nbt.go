@@ -1,47 +1,17 @@
 package nbt
 
-// Package ideas.
-//
-// Instead of Read and Write methods implement equivalents from std:
-// - WriteTo(io.Writer) (n int64, err error)  // io.WriterTo interface
-// - ReadFrom(io.Reader) (n int64, err error) // io.ReaderFrom interface
-//
-// DRY away common behavior with a base type like: `type Common struct{}`
-
 import (
 	"bytes"
 	"compress/gzip"
-	"compress/zlib"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 )
 
-const (
-	// Sets the maximum number of elements to show in string representations of types: NBT_List, NBT_ByteArray and NBT_IntArray.
-	StringNum = 10
-)
-
-var (
-	ErrEndTop     = errors.New("End tag found at top level.")
-	ErrInvalidTop = errors.New("Expected compound at top level.")
-)
-
-// TagType is the header byte value that identifies the type of tag(s). List &
-// Compound types send TagType over the wire as a signed byte, using a int8 as
-// underlying type allows us to assign TagType to Byte.
-type TagType int8
-
-func (tt *TagType) Read(reader io.Reader) (err error) {
-	err = binary.Read(reader, binary.BigEndian, tt)
-	return
-}
-
-func (tt TagType) Write(writer io.Writer) (err error) {
-	err = binary.Write(writer, binary.BigEndian, tt)
-	return
-}
+// Sets the maximum number of elements to show in string representations of
+// types: NBT_ByteArray and NBT_IntArray.
+const ArrayNum = 8
 
 const (
 	// Tag types. All these can be used to create a new tag, except TagEnd.
@@ -59,142 +29,119 @@ const (
 	TagIntArray                 // Size: 4 + 4*elem
 )
 
-var tagProperties = map[TagType]string{
-	TagEnd:       "TagEnd",
-	TagByte:      "TagByte",
-	TagShort:     "TagShort",
-	TagInt:       "TagInt",
-	TagLong:      "TagLong",
-	TagFloat:     "TagFloat",
-	TagDouble:    "TagDouble",
-	TagByteArray: "TagByteArray",
-	TagString:    "TagString",
-	TagList:      "TagList",
-	TagCompound:  "TagCompound",
-	TagIntArray:  "TagIntArray",
+var (
+	ErrEndTop     = errors.New("End tag found at top level.")
+	ErrInvalidTop = errors.New("Expected compound at top level.")
+
+	// String representation of each TagType
+	tagName = map[TagType]string{
+		TagEnd:       "TagEnd",
+		TagByte:      "TagByte",
+		TagShort:     "TagShort",
+		TagInt:       "TagInt",
+		TagLong:      "TagLong",
+		TagFloat:     "TagFloat",
+		TagDouble:    "TagDouble",
+		TagByteArray: "TagByteArray",
+		TagString:    "TagString",
+		TagList:      "TagList",
+		TagCompound:  "TagCompound",
+		TagIntArray:  "TagIntArray",
+	}
+)
+
+// TagType is the header byte value that identifies the type of tag(s). List &
+// Compound types send TagType over the wire as a signed byte, using a int8 as
+// underlying type allows us to assign TagType to Byte.
+type TagType int8
+
+func (tt *TagType) ReadFrom(r io.Reader) (n int64, err error) {
+	// fmt.Printf("TagType was: %q.\n", tt)
+	err = binary.Read(r, binary.BigEndian, tt)
+	if err != nil {
+		return 0, err
+	}
+	// fmt.Printf("TagType now is: %q.\n", tt)
+	return 1, nil
+}
+
+func (tt TagType) WriteTo(w io.Writer) (n int64, err error) {
+	err = binary.Write(w, binary.BigEndian, tt)
+	if err != nil {
+		return 0, err
+	}
+	return 1, nil
 }
 
 func (tt TagType) String() string {
-	if name, ok := tagProperties[tt]; ok {
+	if name, ok := tagName[tt]; ok {
 		return name
 	}
 	return "TagErr"
 }
 
-func (tt TagType) New() (tag Tag, err error) {
+func (tt TagType) New() (t Tag) {
 	switch tt {
+	case TagEnd:
+		t = new(End)
 	case TagByte:
-		tag = new(Byte)
+		t = new(Byte)
 	case TagShort:
-		tag = new(Short)
+		t = new(Short)
 	case TagInt:
-		tag = new(Int)
+		t = new(Int)
 	case TagLong:
-		tag = new(Long)
+		t = new(Long)
 	case TagFloat:
-		tag = new(Float)
+		t = new(Float)
 	case TagDouble:
-		tag = new(Double)
+		t = new(Double)
 	case TagByteArray:
-		tag = new(ByteArray)
+		t = new(ByteArray)
 	case TagString:
-		tag = new(String)
+		t = new(String)
 	case TagList:
-		tag = new(List)
+		t = new(List)
 	case TagCompound:
-		tag = new(Compound)
+		t = new(Compound)
 	case TagIntArray:
-		tag = new(IntArray)
-	default:
-		err = fmt.Errorf("Invalid NBT tag type '%d'.", tt)
+		t = new(IntArray)
 	}
 	return
 }
 
 // Tag is the interface for all tags that can be represented in an NBT tree.
 type Tag interface {
+	io.ReaderFrom
+	io.WriterTo
+	// Name() string
 	Type() TagType
-	Read(io.Reader) error
-	Write(io.Writer) error
+	Size() int64
 	Lookup(path string) Tag // Only Compound implements this
-}
-
-// readNameTag reads tag type, name and tag contents from `src`. Useful for
-// dealing with Compound structs.
-func readNameTag(src io.Reader) (name string, tag Tag, err error) {
-	// Read tag type
-	var tt TagType
-	if err = tt.Read(src); err != nil {
-		return
-	}
-
-	// log.Printf("readNameTag read TagType: %q.\n", tt)
-
-	if tt == TagEnd {
-		// return name, tag, errors.New("TagEnd")
-		return
-	}
-
-	// Read name
-	var nameTag String
-	if err = nameTag.Read(src); err != nil {
-		return
-	}
-	name = nameTag.Value
-
-	// Read tag
-	tag, err = tt.New()
-	if err != nil {
-		return
-	}
-	if err = tag.Read(src); err != nil {
-		return
-	}
-
-	return
-}
-
-// writeNameTag writes tag type, name and tag contents to `dst`. Useful for
-// dealing with Compound structs.
-func writeNameTag(dst io.Writer, name string, tag Tag) (err error) {
-	// Write tag type
-	err = tag.Type().Write(dst)
-	if err != nil {
-		return
-	}
-
-	// Write name
-	var pathName = String{name}
-	err = pathName.Write(dst)
-	if err != nil {
-		return
-	}
-
-	// Write tag
-	err = tag.Write(dst)
-
-	return
 }
 
 // Read reads an NBT compound from the given reader.
 func Read(src io.Reader) (c *Compound, err error) {
-	r := GuessCompression(src)
-
-	name, tag, err := readNameTag(r)
+	r, err := GuessCompression(src)
 	if err != nil {
 		return nil, err
 	}
 
-	if name != "" {
-		// 	return nil, errors.New("Root name should be empty.")
-	}
-	if tag == nil {
-		return nil, ErrEndTop
+	// Read TagType
+	var tt TagType
+	if _, err = tt.ReadFrom(r); err != nil {
+		return nil, err
 	}
 
-	c, ok := tag.(*Compound)
-	if !ok {
+	// TagType should be TagCompound
+	if tt != TagCompound {
 		return nil, ErrInvalidTop
+	}
+
+	c = new(Compound)
+	_, err = c.ReadFrom(r)
+	if err != nil {
+		return nil, err
 	}
 
 	return c, nil
@@ -202,46 +149,60 @@ func Read(src io.Reader) (c *Compound, err error) {
 
 // Write writes an NBT compound to the given writer. Doesn't handle compression.
 func Write(dst io.Writer, name string, tag *Compound) error {
-	return writeNameTag(dst, name, tag)
+	return nil
+	// return writeNameTag(dst, name, tag)
 }
 
-// GuessCompression determines if a NBT io.Reader is compressed or not.
-func GuessCompression(src io.Reader) (r io.Reader) {
-	// Inspired on: http://goo.gl/pRNZl
-	//
-	//     " What I would do is give gzip.NewReader an io.Reader implementation
-	//     which copies everything it Reads into a bytes.Buffer.
-	//
-	//     Then, if gzip.NewReader fails, make a new io.MultiReader
-	//     concatenating that buffer of reads with "fh", which (potentially)
-	//     data yet to be read. "
+// GuessCompression determines if a NBT io.Reader is gzip-compressed or not.
+// Inspired on: http://goo.gl/pRNZl
+func GuessCompression(r io.Reader) (rr io.Reader, err error) {
+	// It seems most (all?) gzip files contain a "magic number" prefix 0x1f8b.
+	const magicNumberRead = 2
 
-	var buf [3]bytes.Buffer
-	var err error
-
-	// Copy first bytes
-	io.CopyN(io.MultiWriter(&buf[0], &buf[1], &buf[2]), src, 10)
-
-	// Is it gzip'd?
-	r, err = gzip.NewReader(io.MultiReader(&buf[0], src))
-	if err == gzip.ErrHeader {
-		// log.Println("It's not gzip compressed.")
-	} else {
-		// log.Println("It's gzip compressed!")
-		return
+	var buf bytes.Buffer
+	if nn, err := io.CopyN(&buf, r, magicNumberRead); nn != 2 || err != nil {
+		return nil, err
 	}
 
-	// Is it zlib'd?
-	r, err = zlib.NewReader(io.MultiReader(&buf[1], src))
-	if err == zlib.ErrHeader {
-		// log.Println("It's not zlib compressed.")
-	} else {
-		// log.Println("It's zlib compressed!")
-		return
+	// Check if reader has that prefix.
+	if !bytes.Equal(buf.Bytes(), []byte{0x1f, 0x8b}) {
+		// Concatenate whatever we read previously with all remaining contents.
+		return io.MultiReader(&buf, r), nil
 	}
 
-	// log.Println("It's uncompressed!")
+	// File was gzip'd
+	rr, err = gzip.NewReader(io.MultiReader(&buf, r))
+	switch err {
+	case gzip.ErrHeader:
+		// File isn't gzip'd
+	case nil:
+		return
+	default:
+		log.Fatalln("nbt.GuessCompression:", err)
+	}
 
-	// Concatenate whatever we read previously with all remaining contents.
-	return io.MultiReader(&buf[2], src)
+	return
 }
+
+// readNameTag reads tag type, name and tag contents from `src`. Useful for
+// dealing with Compound structs.
+// func readNameTag(r io.Reader) (name string, tag Tag, err error) {}
+
+// writeNameTag writes tag type, name and tag contents to `w`. Useful for
+// dealing with Compound structs.
+// func writeNameTag(w io.Writer, name string, tag Tag) (err error) {
+//  // Write tag type
+//  _, err = tag.Type().WriteTo(w)
+//  if err != nil {
+//      return
+//  }
+//  // Write name
+//  pathName := String{name}
+//  _, err = pathName.WriteTo(w)
+//  if err != nil {
+//      return
+//  }
+//  // Write payload
+//  _, err = tag.WriteTo(w)
+//  return
+// }

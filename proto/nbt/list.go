@@ -14,10 +14,10 @@ type List struct {
 	Value []Tag
 }
 
-func (*List) Type() TagType          { return TagList }
-func (*List) Lookup(path string) Tag { return nil }
+func (l List) Type() TagType          { return TagList }
+func (l List) Lookup(path string) Tag { return nil }
 
-func (l *List) String() string {
+func (l List) String() string {
 	return fmt.Sprintf("NBT_List(size: %d) [ %s ]", len(l.Value), l.Value)
 }
 
