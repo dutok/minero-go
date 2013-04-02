@@ -23,23 +23,7 @@ func (b *Byte) WriteTo(w io.Writer) (n int64, err error) {
 	return 1, nil
 }
 
-type UByte byte
-
-func (u *UByte) ReadFrom(r io.Reader) (n int64, err error) {
-	err = binary.Read(r, binary.BigEndian, u)
-	if err != nil {
-		return 0, err
-	}
-	return 1, nil
-}
-
-func (u *UByte) WriteTo(w io.Writer) (n int64, err error) {
-	err = binary.Write(w, binary.BigEndian, u)
-	if err != nil {
-		return 0, err
-	}
-	return 1, nil
-}
+// type UByte byte // Same implementation as Byte
 
 type Short int16
 
