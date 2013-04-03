@@ -27,17 +27,20 @@ func (s *String) ReadFrom(r io.Reader) (n int64, err error) {
 	var length uint16
 	err = binary.Read(r, binary.BigEndian, &length)
 	if err != nil {
-		return
+		return 0, err
 	}
+	n = int64(length)
 
 	if length > 0 {
 		// Read length bytes
 		arr := make([]byte, length)
-		_, err = io.ReadFull(r, arr)
+
+		var nn int
+		nn, err = io.ReadFull(r, arr)
 		if err != nil {
 			return
 		}
-		n += int64(length)
+		n += int64(nn)
 
 		s.Value = string(arr)
 	}

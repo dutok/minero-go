@@ -9,11 +9,13 @@ import (
 // Compounds hold a list of a named tags. Order is not guaranteed.
 // TagType: 10, Size: 1 + 4 + elem * id_size bytes
 type Compound struct {
+	Name  string
 	Value map[string]Tag
 }
 
 func NewCompound(name string) *Compound {
 	c := &Compound{
+		Name:  name,
 		Value: make(map[string]Tag),
 	}
 	return c
@@ -43,7 +45,7 @@ func (c Compound) Lookup(path string) Tag {
 		return tag.Lookup(components[1])
 	}
 
-	return
+	return tag
 }
 
 func (c *Compound) String() string {
@@ -63,29 +65,14 @@ func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 	// Empty compound
 	c.Value = make(map[string]Tag)
 
-	// Top level compound name is read but ignored
-	var name String
-	nn, err = name.ReadFrom(r)
-	if err != nil {
-		fmt.Println("Compound.ReadFrom name error:", err)
-		return
-	}
-	fmt.Printf("Compound name: %q\n", name.Value)
-	n += nn
-
-	var tt TagType
 	for {
 		// Read tag type
+		var tt TagType
 		nn, err = tt.ReadFrom(r)
-		// End of compound?
-		// if tt == TagEnd || err == io.EOF {
-		if tt == TagEnd {
-			fmt.Println("Compound.ReadFrom TagEnd/EOF found error:", err)
+		switch {
+		case tt == TagEnd:
 			return n + 1, nil // TagEnd is 1 byte
-		}
-		fmt.Println("Compound.ReadFrom TagType:", tt)
-		if err != nil {
-			fmt.Println("Compound.ReadFrom TagType error:", err)
+		case err != nil:
 			return
 		}
 		n += nn
@@ -94,10 +81,8 @@ func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 		var name String
 		nn, err = name.ReadFrom(r)
 		if err != nil {
-			fmt.Println("Compound.ReadFrom tag name error:", err)
 			return
 		}
-		fmt.Println("Compound.ReadFrom tag name:", err)
 		n += nn
 
 		// Read payload
@@ -107,15 +92,12 @@ func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 		nn, err = tag.ReadFrom(r)
 		if err != nil {
-			fmt.Println("Compound.ReadFrom payload error:", err)
 			return
 		}
 		n += nn
 
 		// Save kv pair
 		c.Value[name.Value] = tag
-
-		fmt.Printf("%s payload: %q\n", tt, tag)
 	}
 
 	return

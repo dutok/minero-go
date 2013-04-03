@@ -10,56 +10,63 @@ import (
 // ByteArray holds a length-prefixed array of signed bytes. The prefix is a
 // signed integer (4 bytes).
 // TagType: 7, Size: 4 + elem * 1 bytes
-type ByteArray []types.Byte
-
-func (*ByteArray) Type() TagType             { return TagByteArray }
-func (b ByteArray) Size() int64              { return int64(4 + len(b)) }
-func (*ByteArray) Lookup(path string) Tagger { return nil }
-
-func (b ByteArray) String() string {
-	s := "NBT_ByteArray(size: %d) [% x, ... (%d elem(s) more)]"
-	return fmt.Sprintf(s, len(b), b[:StringNum], len(b)-StringNum)
+type ByteArray struct {
+	Value []types.Byte
 }
 
-func (b *ByteArray) ReadFrom(reader io.Reader) (n int64, err error) {
-	var length Int
+func (b ByteArray) Type() TagType          { return TagByteArray }
+func (b ByteArray) Size() int64            { return int64(4 + len(b.Value)) }
+func (b ByteArray) Lookup(path string) Tag { return nil }
+
+func (b ByteArray) String() string {
+	s := "NBT_ByteArray('%s', size: %d) [% x, ... (%d elem(s) more)]"
+	return fmt.Sprintf(s, len(b.Value), b.Value[:ArrayNum], len(b.Value)-ArrayNum)
+}
+
+func (b *ByteArray) ReadFrom(r io.Reader) (n int64, err error) {
+	var nn int64
 
 	// Read length-prefix
-	// _, err = length.ReadFrom(reader)
+	var length Int
+	nn, err = length.ReadFrom(r)
 	if err != nil {
 		return
 	}
+	n += nn
 
 	// Read length bytes
 	arr := make([]types.Byte, length.Int)
 	for _, elem := range arr {
-		_, err = elem.ReadFrom(reader)
+		nn, err = elem.ReadFrom(r)
 		if err != nil {
 			return
 		}
+		n += nn
 	}
-	// _, err = io.Copy(b, reader)
 
-	*b = arr
+	b.Value = arr
 	return
 }
 
-func (b *ByteArray) WriteTo(writer io.Writer) (n int64, err error) {
-	var length = types.Int(len(*b))
+func (b *ByteArray) WriteTo(w io.Writer) (n int64, err error) {
+	var nn int64
 
 	// Write length-prefix
-	if _, err = length.WriteTo(writer); err != nil {
+	var length = types.Int(len(b.Value))
+	nn, err = length.WriteTo(w)
+	if err != nil {
 		return
 	}
+	n += nn
 
 	// Then write byte array
-	for _, elem := range *b {
-		_, err = elem.WriteTo(writer)
+	for _, elem := range b.Value {
+		nn, err = elem.WriteTo(w)
 		if err != nil {
 			return
 		}
+		n += nn
 	}
-	// err = io.Copy(writer, b)
 
 	return
 }
@@ -67,56 +74,66 @@ func (b *ByteArray) WriteTo(writer io.Writer) (n int64, err error) {
 // IntArray holds a length-prefixed array of signed integers. The prefix is a
 // signed integer (4 bytes) and indicates the number of 4 byte integers.
 // TagType: 11, Size: 4 + 4 * elem
-type IntArray []types.Int
+type IntArray struct {
+	Value []types.Int
+}
 
-func (*IntArray) Type() TagType             { return TagIntArray }
-func (i IntArray) Size() int64              { return int64(4 + len(i)) }
-func (*IntArray) Lookup(path string) Tagger { return nil }
+func (i IntArray) Type() TagType          { return TagIntArray }
+func (i IntArray) Size() int64            { return int64(4 + len(i.Value)) }
+func (i IntArray) Lookup(path string) Tag { return nil }
 func (i IntArray) String() string {
 	var values []int32
-	for _, elem := range i[:StringNum] {
+	for _, elem := range i.Value[:ArrayNum] {
 		values = append(values, int32(elem))
 	}
 
-	s := "NBT_IntArray(size: %d) [% d, ... (%d elem(s) more)]"
-	return fmt.Sprintf(s, len(i), values, len(i)-StringNum)
+	s := "NBT_IntArray('%s', size: %d) [% d, ... (%d elem(s) more)]"
+	return fmt.Sprintf(s, len(i.Value), values, len(i.Value)-ArrayNum)
 }
 
-func (i *IntArray) ReadFrom(reader io.Reader) (n int64, err error) {
-	var length Int
+func (i *IntArray) ReadFrom(r io.Reader) (n int64, err error) {
+	var nn int64
 
 	// Read length-prefix
-	_, err = length.ReadFrom(reader)
+	var length Int
+	nn, err = length.ReadFrom(r)
 	if err != nil {
 		return
 	}
+	n += nn
 
 	// Read length bytes
 	arr := make([]types.Int, length.Int)
 	for _, elem := range arr {
-		_, err = elem.ReadFrom(reader)
+		nn, err = elem.ReadFrom(r)
 		if err != nil {
 			return
 		}
+		n += nn
 	}
 
-	*i = arr
+	i.Value = arr
 	return
 }
 
-func (i *IntArray) WriteTo(writer io.Writer) (n int64, err error) {
-	length := types.Int(len(*i))
+func (i *IntArray) WriteTo(w io.Writer) (n int64, err error) {
+	var nn int64
 
 	// Write length-prefix
-	if _, err = length.WriteTo(writer); err != nil {
+	var length = types.Int(len(i.Value))
+	nn, err = length.WriteTo(w)
+	if err != nil {
 		return
 	}
+	n += nn
 
 	// Then write int array
-	for _, tag := range *i {
-		if _, err = tag.WriteTo(writer); err != nil {
+	for _, tag := range i.Value {
+		nn, err = tag.WriteTo(w)
+		if err != nil {
 			return
 		}
+		n += nn
 	}
 	return
 }

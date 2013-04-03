@@ -56,16 +56,14 @@ var (
 type TagType int8
 
 func (tt *TagType) ReadFrom(r io.Reader) (n int64, err error) {
-	// fmt.Printf("TagType was: %q.\n", tt)
 	err = binary.Read(r, binary.BigEndian, tt)
 	if err != nil {
 		return 0, err
 	}
-	// fmt.Printf("TagType now is: %q.\n", tt)
 	return 1, nil
 }
 
-func (tt TagType) WriteTo(w io.Writer) (n int64, err error) {
+func (tt *TagType) WriteTo(w io.Writer) (n int64, err error) {
 	err = binary.Write(w, binary.BigEndian, tt)
 	if err != nil {
 		return 0, err
@@ -120,13 +118,21 @@ type Tag interface {
 	Lookup(path string) Tag // Only Compound implements this
 }
 
-// Read reads an NBT compound from the given reader.
-func Read(src io.Reader) (c *Compound, err error) {
-	r, err := GuessCompression(src)
+// Read reads an NBT compound from the given reader uncompressing contents from
+// reader if they are gzip'd.
+func Read(r io.Reader) (c *Compound, err error) {
+	var rr io.Reader
+	rr, _, err = GuessCompression(r)
 	if err != nil {
 		return nil, err
 	}
 
+	return ReadRaw(rr)
+}
+
+// ReadRaw reads an NBT compound from the given reader. It doesn't try to guess
+// compression.
+func ReadRaw(r io.Reader) (c *Compound, err error) {
 	// Read TagType
 	var tt TagType
 	if _, err = tt.ReadFrom(r); err != nil {
@@ -138,7 +144,15 @@ func Read(src io.Reader) (c *Compound, err error) {
 		return nil, ErrInvalidTop
 	}
 
-	c = new(Compound)
+	// Read compound name
+	var name String
+	_, err = name.ReadFrom(r)
+	if err != nil {
+		return
+	}
+
+	// Read compound contents
+	c = NewCompound(name.Value)
 	_, err = c.ReadFrom(r)
 	if err != nil {
 		return nil, err
@@ -154,34 +168,33 @@ func Write(dst io.Writer, name string, tag *Compound) error {
 }
 
 // GuessCompression determines if a NBT io.Reader is gzip-compressed or not.
-// Inspired on: http://goo.gl/pRNZl
-func GuessCompression(r io.Reader) (rr io.Reader, err error) {
-	// It seems most (all?) gzip files contain a "magic number" prefix 0x1f8b.
-	const magicNumberRead = 2
+// Lots of inspiration here: http://goo.gl/pRNZl
+func GuessCompression(r io.Reader) (rr io.Reader, gz bool, err error) {
+	// It seems most (all?) gzip files contain a "magic number" prefix '0x1f'.
+	const magicNum = 1
 
 	var buf bytes.Buffer
-	if nn, err := io.CopyN(&buf, r, magicNumberRead); nn != 2 || err != nil {
-		return nil, err
+	if nn, err := io.CopyN(&buf, r, magicNum); nn != magicNum || err != nil {
+		return nil, false, err
 	}
 
 	// Check if reader has that prefix.
-	if !bytes.Equal(buf.Bytes(), []byte{0x1f, 0x8b}) {
-		// Concatenate whatever we read previously with all remaining contents.
-		return io.MultiReader(&buf, r), nil
+	if bytes.Equal(buf.Bytes(), []byte{0x1f}) {
+		// File was gzip'd
+		rr, err = gzip.NewReader(io.MultiReader(&buf, r))
+		switch err {
+		case gzip.ErrHeader:
+			// File isn't gzip'd
+		case nil:
+			gz = true
+			return
+		default:
+			log.Fatalln("nbt.GuessCompression:", err)
+		}
 	}
 
-	// File was gzip'd
-	rr, err = gzip.NewReader(io.MultiReader(&buf, r))
-	switch err {
-	case gzip.ErrHeader:
-		// File isn't gzip'd
-	case nil:
-		return
-	default:
-		log.Fatalln("nbt.GuessCompression:", err)
-	}
-
-	return
+	// Concatenate whatever we read previously with all remaining contents.
+	return io.MultiReader(&buf, r), false, nil
 }
 
 // readNameTag reads tag type, name and tag contents from `src`. Useful for
