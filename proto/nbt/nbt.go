@@ -1,20 +1,36 @@
 package nbt
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/binary"
 	"errors"
 	"io"
-	"log"
 )
 
 // Sets the maximum number of elements to show in string representations of
 // types: NBT_ByteArray and NBT_IntArray.
 const ArrayNum = 8
 
+var (
+	ErrEndTop     = errors.New("End tag found at top level.")
+	ErrInvalidTop = errors.New("Expected compound at top level.")
+)
+
+// Tag is the interface for all tags that can be represented in an NBT tree.
+type Tag interface {
+	io.ReaderFrom
+	io.WriterTo
+	Type() TagType
+	Size() int64
+	Lookup(path string) Tag
+}
+
+// TagType is the header byte value that identifies the type of tag(s). List &
+// Compound types send TagType over the wire as a signed byte, using a int8 as
+// underlying type allows us to assign TagType to Byte.
+type TagType int8
+
 const (
-	// Tag types. All these can be used to create a new tag, except TagEnd.
+	// Tag types. All these can be used to create a new tag.
 	TagEnd       TagType = iota // Size: 0
 	TagByte                     // Size: 1
 	TagShort                    // Size: 2
@@ -29,32 +45,23 @@ const (
 	TagIntArray                 // Size: 4 + 4*elem
 )
 
-var (
-	ErrEndTop     = errors.New("End tag found at top level.")
-	ErrInvalidTop = errors.New("Expected compound at top level.")
+// String representation of each TagType
+var tagName = map[TagType]string{
+	TagEnd:       "TagEnd",
+	TagByte:      "TagByte",
+	TagShort:     "TagShort",
+	TagInt:       "TagInt",
+	TagLong:      "TagLong",
+	TagFloat:     "TagFloat",
+	TagDouble:    "TagDouble",
+	TagByteArray: "TagByteArray",
+	TagString:    "TagString",
+	TagList:      "TagList",
+	TagCompound:  "TagCompound",
+	TagIntArray:  "TagIntArray",
+}
 
-	// String representation of each TagType
-	tagName = map[TagType]string{
-		TagEnd:       "TagEnd",
-		TagByte:      "TagByte",
-		TagShort:     "TagShort",
-		TagInt:       "TagInt",
-		TagLong:      "TagLong",
-		TagFloat:     "TagFloat",
-		TagDouble:    "TagDouble",
-		TagByteArray: "TagByteArray",
-		TagString:    "TagString",
-		TagList:      "TagList",
-		TagCompound:  "TagCompound",
-		TagIntArray:  "TagIntArray",
-	}
-)
-
-// TagType is the header byte value that identifies the type of tag(s). List &
-// Compound types send TagType over the wire as a signed byte, using a int8 as
-// underlying type allows us to assign TagType to Byte.
-type TagType int8
-
+// ReadFrom satifies io.ReaderFrom interface.
 func (tt *TagType) ReadFrom(r io.Reader) (n int64, err error) {
 	err = binary.Read(r, binary.BigEndian, tt)
 	if err != nil {
@@ -63,7 +70,8 @@ func (tt *TagType) ReadFrom(r io.Reader) (n int64, err error) {
 	return 1, nil
 }
 
-func (tt *TagType) WriteTo(w io.Writer) (n int64, err error) {
+// WriteTo satifies io.WriterTo interface.
+func (tt TagType) WriteTo(w io.Writer) (n int64, err error) {
 	err = binary.Write(w, binary.BigEndian, tt)
 	if err != nil {
 		return 0, err
@@ -107,115 +115,3 @@ func (tt TagType) New() (t Tag) {
 	}
 	return
 }
-
-// Tag is the interface for all tags that can be represented in an NBT tree.
-type Tag interface {
-	io.ReaderFrom
-	io.WriterTo
-	// Name() string
-	Type() TagType
-	Size() int64
-	Lookup(path string) Tag // Only Compound implements this
-}
-
-// Read reads an NBT compound from the given reader uncompressing contents from
-// reader if they are gzip'd.
-func Read(r io.Reader) (c *Compound, err error) {
-	var rr io.Reader
-	rr, _, err = GuessCompression(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return ReadRaw(rr)
-}
-
-// ReadRaw reads an NBT compound from the given reader. It doesn't try to guess
-// compression.
-func ReadRaw(r io.Reader) (c *Compound, err error) {
-	// Read TagType
-	var tt TagType
-	if _, err = tt.ReadFrom(r); err != nil {
-		return nil, err
-	}
-
-	// TagType should be TagCompound
-	if tt != TagCompound {
-		return nil, ErrInvalidTop
-	}
-
-	// Read compound name
-	var name String
-	_, err = name.ReadFrom(r)
-	if err != nil {
-		return
-	}
-
-	// Read compound contents
-	c = NewCompound(name.Value)
-	_, err = c.ReadFrom(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-// Write writes an NBT compound to the given writer. Doesn't handle compression.
-func Write(dst io.Writer, name string, tag *Compound) error {
-	return nil
-	// return writeNameTag(dst, name, tag)
-}
-
-// GuessCompression determines if a NBT io.Reader is gzip-compressed or not.
-// Lots of inspiration here: http://goo.gl/pRNZl
-func GuessCompression(r io.Reader) (rr io.Reader, gz bool, err error) {
-	// It seems most (all?) gzip files contain a "magic number" prefix '0x1f'.
-	const magicNum = 1
-
-	var buf bytes.Buffer
-	if nn, err := io.CopyN(&buf, r, magicNum); nn != magicNum || err != nil {
-		return nil, false, err
-	}
-
-	// Check if reader has that prefix.
-	if bytes.Equal(buf.Bytes(), []byte{0x1f}) {
-		// File was gzip'd
-		rr, err = gzip.NewReader(io.MultiReader(&buf, r))
-		switch err {
-		case gzip.ErrHeader:
-			// File isn't gzip'd
-		case nil:
-			gz = true
-			return
-		default:
-			log.Fatalln("nbt.GuessCompression:", err)
-		}
-	}
-
-	// Concatenate whatever we read previously with all remaining contents.
-	return io.MultiReader(&buf, r), false, nil
-}
-
-// readNameTag reads tag type, name and tag contents from `src`. Useful for
-// dealing with Compound structs.
-// func readNameTag(r io.Reader) (name string, tag Tag, err error) {}
-
-// writeNameTag writes tag type, name and tag contents to `w`. Useful for
-// dealing with Compound structs.
-// func writeNameTag(w io.Writer, name string, tag Tag) (err error) {
-//  // Write tag type
-//  _, err = tag.Type().WriteTo(w)
-//  if err != nil {
-//      return
-//  }
-//  // Write name
-//  pathName := String{name}
-//  _, err = pathName.WriteTo(w)
-//  if err != nil {
-//      return
-//  }
-//  // Write payload
-//  _, err = tag.WriteTo(w)
-//  return
-// }

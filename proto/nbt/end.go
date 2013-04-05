@@ -15,6 +15,7 @@ func (e End) Size() int64            { return 1 }
 func (e End) Lookup(path string) Tag { return nil }
 func (e End) String() string         { return "NBT_End" }
 
+// ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (e *End) ReadFrom(r io.Reader) (n int64, err error) {
 	var tid byte
 
@@ -26,6 +27,7 @@ func (e *End) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
+// ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (e *End) WriteTo(w io.Writer) (n int64, err error) {
 	var tid byte
 

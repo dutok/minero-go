@@ -29,8 +29,7 @@ func (l List) String() string {
 	return fmt.Sprintf("NBT_List(size: %d) % s", len(l.Value), l.Value)
 }
 
-// ReadFrom satifies the io.ReaderFrom interface. Reads: list name, tag type and
-// length elements and all list elements.
+// ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (l *List) ReadFrom(r io.Reader) (n int64, err error) {
 	var nn int64
 
@@ -52,15 +51,13 @@ func (l *List) ReadFrom(r io.Reader) (n int64, err error) {
 	// Read list items
 	if length.Int > 0 {
 		l.Value = make([]Tag, length.Int)
-		for _, elem := range l.Value {
+		for index, elem := range l.Value {
 			elem = l.Typ.New()
-			if elem != nil {
-				return
-			}
 			nn, err = elem.ReadFrom(r)
 			if err != nil {
 				return
 			}
+			l.Value[index] = elem
 			n += nn
 		}
 
@@ -69,12 +66,9 @@ func (l *List) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
+// WriteTo satifies io.WriterTo interface. TypeId is not encoded.
 func (l *List) WriteTo(w io.Writer) (n int64, err error) {
 	var nn int64
-
-	// Read TagType
-	nn, err = l.Typ.WriteTo(w)
-	n += nn
 
 	// Write TagType prefix
 	tt := types.Byte(l.Typ)

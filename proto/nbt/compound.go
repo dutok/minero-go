@@ -59,6 +59,7 @@ func (c *Compound) String() string {
 	return fmt.Sprintf("NBT_Compound(size: %d) {\n%s\n}", len(c.Value), content)
 }
 
+// ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 	var nn int64
 
@@ -86,7 +87,13 @@ func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 		n += nn
 
 		// Read payload
-		tag := tt.New()
+		var tag Tag
+		// Corner case: Compounds keep a copy of their name
+		if tt == TagCompound {
+			tag = NewCompound(name.Value)
+		} else {
+			tag = tt.New()
+		}
 		if tag == nil {
 			return n, fmt.Errorf("Compound.ReadFrom wrong TagType %d.", tt)
 		}
@@ -103,15 +110,36 @@ func (c *Compound) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-// TODO(toqueteos): Incomplete
+// WriteTo satifies io.WriterTo interface. TypeId is not encoded.
 func (c *Compound) WriteTo(w io.Writer) (n int64, err error) {
-	// for name, tag := range c.Value {
-	// 	err = writeNameTag(w, name, tag)
-	// 	if err != nil {
-	// 		return
-	// 	}
-	// }
-	// // Write TagEnd
-	// TagEnd.New().WriteTo(w)
-	return 0, nil
+	var nn int64
+
+	for name, tag := range c.Value {
+		nn, err = tag.Type().WriteTo(w)
+		if err != nil {
+			return
+		}
+		n += nn
+
+		nameTag := &String{name}
+		nn, err = nameTag.WriteTo(w)
+		if err != nil {
+			return
+		}
+		n += nn
+
+		nn, err = tag.WriteTo(w)
+		if err != nil {
+			return
+		}
+		n += nn
+	}
+
+	nn, err = TagEnd.New().WriteTo(w)
+	if err != nil {
+		return
+	}
+	n += nn
+
+	return
 }

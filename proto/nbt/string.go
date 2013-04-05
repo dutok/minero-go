@@ -22,6 +22,7 @@ func (s String) String() string {
 	return fmt.Sprintf("NBT_String(size: %d) %q", len(s.Value), s.Value)
 }
 
+// ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (s *String) ReadFrom(r io.Reader) (n int64, err error) {
 	// unsigned short, can't use Short
 	var length uint16
@@ -48,8 +49,9 @@ func (s *String) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
+// WriteTo satifies io.WriterTo interface. TypeId is not encoded.
 func (s *String) WriteTo(w io.Writer) (n int64, err error) {
-	// unsigned length-prefix, we can't use Short
+	// unsigned short, can't use Short
 	var length = uint16(len(s.Value))
 	err = binary.Write(w, binary.BigEndian, &length)
 	if err != nil {
