@@ -19,7 +19,7 @@ Features
 
 - NBT v19133 support.
     - nbtdebug command on [`bin/nbtdebug`](https://github.com/toqueteos/minero/blob/master/bin/nbtdebug).
-- Basic [datatypes](http://wiki.vg/Data_Types) support (bool, byte, short, int, long, float & double).
+- Basic [data types](http://wiki.vg/Data_Types) support (bool, byte, short, int, long, float, double and string). See [`types`](https://github.com/toqueteos/minero/blob/master/types), [`types/nbt`](https://github.com/toqueteos/minero/blob/master/types/nbt) and [`types/minecraft`](https://github.com/toqueteos/minero/blob/master/types/minecraft).
 - Proxy with logging support available.
     - miproxy command on [`bin/miproxy`](https://github.com/toqueteos/minero/blob/master/bin/miproxy).
 
