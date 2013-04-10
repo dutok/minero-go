@@ -72,10 +72,10 @@ func (p *KeepAlive) WriteTo(w io.Writer) (n int64, err error) {
 	return rw.Result()
 }
 
-// LoginRequest is a server to client packet.
+// LoginInfo is a server to client packet.
 //
 // Total Size: 12 bytes + length of strings
-type LoginRequest struct {
+type LoginInfo struct {
 	Entity     int32
 	LevelType  string // level-type in server.properties
 	GameMode   int8   // 0: survival, 1: creative, 2: adventure. Bit 3 (0x8) is the hardcore flag
@@ -85,8 +85,8 @@ type LoginRequest struct {
 	MaxPlayers int8 // Used by the client to draw the player list
 }
 
-func (p LoginRequest) Id() byte { return 0x01 }
-func (p *LoginRequest) ReadFrom(r io.Reader) (n int64, err error) {
+func (p LoginInfo) Id() byte { return 0x01 }
+func (p *LoginInfo) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
 	// id := rw.MustReadByte(r)
 	// rw.Check(CheckPacketId(id))
@@ -99,7 +99,7 @@ func (p *LoginRequest) ReadFrom(r io.Reader) (n int64, err error) {
 
 	return rw.Result()
 }
-func (p *LoginRequest) WriteTo(w io.Writer) (n int64, err error) {
+func (p *LoginInfo) WriteTo(w io.Writer) (n int64, err error) {
 	rw.Reset()
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
@@ -107,7 +107,7 @@ func (p *LoginRequest) WriteTo(w io.Writer) (n int64, err error) {
 	rw.MustWriteByte(w, p.GameMode)
 	rw.MustWriteByte(w, p.Dimension)
 	rw.MustWriteByte(w, p.Difficulty)
-	rw.MustWriteByte(w, 0) // see LoginRequest._WorldHeight
+	rw.MustWriteByte(w, 0) // see LoginInfo._WorldHeight
 	rw.MustWriteByte(w, p.MaxPlayers)
 
 	return rw.Result()

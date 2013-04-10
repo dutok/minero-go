@@ -2,7 +2,7 @@ package minecraft
 
 const (
 	PacketKeepAlive          byte = iota
-	PacketLoginRequest            // 0x01
+	PacketLoginInfo               // 0x01
 	PacketHandshake               // 0x02
 	PacketChatMessage             // 0x03
 	PacketTimeUpdate              // 0x04
@@ -91,7 +91,7 @@ const (
 
 var packetNames = map[byte]string{
 	0x00: "KeepAlive",
-	0x01: "LoginRequest",
+	0x01: "LoginInfo",
 	0x02: "Handshake",
 	0x03: "ChatMessage",
 	0x04: "TimeUpdate",
