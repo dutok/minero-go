@@ -41,9 +41,7 @@ const (
 	PacketEntityEffect            // 0x25
 	PacketEntityEffectRemove      // 0x26
 	PacketSetExperience           // 0x27
-)
 
-const (
 	PacketChunkData           byte = iota + 0x33
 	PacketBlockChangeMulti         // 0x34
 	PacketBlockChange              // 0x35
@@ -54,14 +52,10 @@ const (
 	PacketSoundEffect              // 0x40
 	PacketSoundEffectNamed         // 0x41
 	PacketParticle                 // 0x42
-)
 
-const (
 	PacketGameStateChange   byte = iota + 0x46
 	PacketEntityGlobalSpawn      // 0x47
-)
 
-const (
 	PacketWindowOpen              byte = iota + 0x64
 	PacketWindowClose                  // 0x65
 	PacketWindowClick                  // 0x66
@@ -71,15 +65,11 @@ const (
 	PacketConfirmTransaction           // 0x6a
 	PacketCreativeInventoryAction      // 0x6b
 	PacketEnchantItem                  // 0x6c
-)
 
-const (
 	PacketSignUpdate       byte = iota + 0x82
 	PacketItemData              // 0x83
 	PacketTileEntityUpdate      // 0x84
-)
 
-const (
 	PacketStatIncrement     byte = iota + 0xC8
 	PacketPlayerTabListPing      // 0xc9
 	PacketPlayerAbilities        // 0xca
@@ -90,11 +80,9 @@ const (
 	PacketScoreUpdate            // 0xcf
 	PacketScoreDisplay           // 0xd0
 	PacketScoreTeams             // 0xd1
-)
 
-const PacketPluginMessage byte = 0xFA
+	PacketPluginMessage byte = 0xFA
 
-const (
 	PacketEncryptionKeyResponse byte = iota + 0xFC
 	PacketEncryptionKeyRequest       // 0xFD
 	PacketServerListPing             // 0xFE
