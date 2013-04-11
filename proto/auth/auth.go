@@ -17,7 +17,9 @@ func GenerateKeyPair() *rsa.PrivateKey {
 	return priv
 }
 
-// KeyExchange marshals a RSA Public Key
+// KeyExchange marshals a RSA Public Key in ASN.1 format as defined by x.509
+// (serialises a public key to DER-encoded PKIX format). See crypto/x509:
+// x509.MarshalPKIXPublicKey.
 func KeyExchange(pub *rsa.PublicKey) []byte {
 	asn1, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
