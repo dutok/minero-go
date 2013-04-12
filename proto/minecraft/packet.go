@@ -57,8 +57,6 @@ type KeepAlive struct {
 func (p KeepAlive) Id() byte { return 0x00 }
 func (p *KeepAlive) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.RandomId = rw.MustReadInt(r)
 
 	return rw.Result()
@@ -88,8 +86,6 @@ type LoginInfo struct {
 func (p LoginInfo) Id() byte { return 0x01 }
 func (p *LoginInfo) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.LevelType = rw.MustReadString(r)
 	p.GameMode = rw.MustReadByte(r)
 	p.Dimension = rw.MustReadByte(r)
@@ -126,8 +122,6 @@ type Handshake struct {
 func (p Handshake) Id() byte { return 0x02 }
 func (p *Handshake) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Version = rw.MustReadByte(r)
 	p.Username = rw.MustReadString(r)
 	p.Host = rw.MustReadString(r)
@@ -165,8 +159,6 @@ type ChatMessage struct {
 func (p ChatMessage) Id() byte { return 0x03 }
 func (p *ChatMessage) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Message = rw.MustReadString(r)
 
 	return rw.Result()
@@ -195,8 +187,6 @@ type TimeUpdate struct {
 func (p TimeUpdate) Id() byte { return 0x04 }
 func (p *TimeUpdate) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WorldAge = rw.MustReadLong(r)
 	p.Time = rw.MustReadLong(r)
 
@@ -223,8 +213,6 @@ type EntityEquipment struct {
 func (p EntityEquipment) Id() byte { return 0x05 }
 func (p *EntityEquipment) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Slot = rw.MustReadShort(r)
 	// p.Item = rw.MustReadSlot(r)
@@ -255,8 +243,6 @@ type SpawnPosition struct {
 func (p SpawnPosition) Id() byte { return 0x06 }
 func (p *SpawnPosition) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadInt(r)
 	p.Z = rw.MustReadInt(r)
@@ -290,8 +276,6 @@ type EntityInteract struct {
 func (p EntityInteract) Id() byte { return 0x07 }
 func (p *EntityInteract) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.From = rw.MustReadInt(r)
 	p.To = rw.MustReadInt(r)
 	p.MouseButton = rw.MustReadBool(r)
@@ -326,8 +310,6 @@ type HealthUpdate struct {
 func (p HealthUpdate) Id() byte { return 0x08 }
 func (p *HealthUpdate) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Health = rw.MustReadShort(r)
 	p.Food = rw.MustReadShort(r)
 	p.Saturation = rw.MustReadFloat(r)
@@ -361,8 +343,6 @@ type Respawn struct {
 func (p Respawn) Id() byte { return 0x09 }
 func (p *Respawn) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Dimension = rw.MustReadInt(r)
 	p.Difficulty = rw.MustReadByte(r)
 	p.GameMode = rw.MustReadByte(r)
@@ -397,8 +377,6 @@ type Player struct {
 func (p Player) Id() byte { return 0x0A }
 func (p *Player) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.OnGround = rw.MustReadBool(r)
 
 	return rw.Result()
@@ -437,8 +415,6 @@ type PlayerPos struct {
 func (p PlayerPos) Id() byte { return 0x0B }
 func (p *PlayerPos) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadDouble(r)
 	p.Y = rw.MustReadDouble(r)
 	p.Stance = rw.MustReadDouble(r)
@@ -484,8 +460,6 @@ type PlayerLook struct {
 func (p PlayerLook) Id() byte { return 0x0C }
 func (p *PlayerLook) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Yaw = rw.MustReadFloat(r)
 	p.Pitch = rw.MustReadFloat(r)
 	p.OnGround = rw.MustReadBool(r)
@@ -519,8 +493,6 @@ type PlayerPosLook struct {
 func (p PlayerPosLook) Id() byte { return 0x0D }
 func (p *PlayerPosLook) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadDouble(r)
 	p.Y = rw.MustReadDouble(r)
 	p.Stance = rw.MustReadDouble(r)
@@ -571,8 +543,6 @@ type PlayerAction struct {
 func (p PlayerAction) Id() byte { return 0x0E }
 func (p *PlayerAction) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Action = rw.MustReadByte(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadByte(r)
@@ -619,8 +589,6 @@ type PlayerBlockPlace struct {
 func (p PlayerBlockPlace) Id() byte { return 0x0F }
 func (p *PlayerBlockPlace) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = byte(rw.MustReadByte(r))
 	p.Z = rw.MustReadInt(r)
@@ -657,8 +625,6 @@ type ItemHeldChange struct {
 func (p ItemHeldChange) Id() byte { return 0x10 }
 func (p *ItemHeldChange) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.SlotId = rw.MustReadShort(r)
 
 	return rw.Result()
@@ -687,8 +653,6 @@ type BedUse struct {
 func (p BedUse) Id() byte { return 0x11 }
 func (p *BedUse) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	_ = rw.MustReadByte(r) // Unknown use, only 0 observed
 	p.X = rw.MustReadInt(r)
@@ -720,8 +684,6 @@ type Animation struct {
 func (p Animation) Id() byte { return 0x12 }
 func (p *Animation) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Animation = rw.MustReadByte(r)
 
@@ -747,8 +709,6 @@ type EntityAction struct {
 func (p EntityAction) Id() byte { return 0x13 }
 func (p *EntityAction) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Action = rw.MustReadByte(r)
 
@@ -783,8 +743,6 @@ type EntityNamedSpawn struct {
 func (p EntityNamedSpawn) Id() byte { return 0x14 }
 func (p *EntityNamedSpawn) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Name = rw.MustReadString(r)
 	p.X = rw.MustReadInt(r)
@@ -827,8 +785,6 @@ type ItemCollect struct {
 func (p ItemCollect) Id() byte { return 0x16 }
 func (p *ItemCollect) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WhatId = rw.MustReadInt(r)
 	p.WhoId = rw.MustReadInt(r)
 
@@ -857,8 +813,6 @@ type SpawnObjectVehicle struct {
 func (p SpawnObjectVehicle) Id() byte { return 0x17 }
 func (p *SpawnObjectVehicle) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Type = rw.MustReadByte(r)
 	p.X = rw.MustReadInt(r)
@@ -900,8 +854,6 @@ type SpawnMob struct {
 func (p SpawnMob) Id() byte { return 0x18 }
 func (p *SpawnMob) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Type = rw.MustReadByte(r)
 	p.X = rw.MustReadInt(r)
@@ -953,8 +905,6 @@ type SpawnPainting struct {
 func (p SpawnPainting) Id() byte { return 0x19 }
 func (p *SpawnPainting) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Title = rw.MustReadString(r)
 	p.X = rw.MustReadInt(r)
@@ -990,8 +940,6 @@ type SpawnExperienceOrb struct {
 func (p SpawnExperienceOrb) Id() byte { return 0x1A }
 func (p *SpawnExperienceOrb) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadInt(r)
@@ -1031,8 +979,6 @@ type EntityVelocity struct {
 func (p EntityVelocity) Id() byte { return 0x1C }
 func (p *EntityVelocity) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.VelX = rw.MustReadShort(r)
 	p.VelY = rw.MustReadShort(r)
@@ -1063,8 +1009,6 @@ type EntityDestroy struct {
 func (p EntityDestroy) Id() byte { return 0x1D }
 func (p *EntityDestroy) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Count = rw.MustReadByte(r)
 	for i := 0; i < int(p.Count); i++ {
 		p.Entities = append(p.Entities, rw.MustReadInt(r))
@@ -1099,8 +1043,6 @@ type Entity struct {
 func (p Entity) Id() byte { return 0x1E }
 func (p *Entity) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 
 	return rw.Result()
@@ -1128,8 +1070,6 @@ type EntityRelMove struct {
 func (p EntityRelMove) Id() byte { return 0x1F }
 func (p *EntityRelMove) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.X = rw.MustReadByte(r)
 	p.Y = rw.MustReadByte(r)
@@ -1163,8 +1103,6 @@ type EntityLook struct {
 func (p EntityLook) Id() byte { return 0x20 }
 func (p *EntityLook) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Yaw = rw.MustReadByte(r)
 	p.Pitch = rw.MustReadByte(r)
@@ -1197,8 +1135,6 @@ type EntityLookRelMove struct {
 func (p EntityLookRelMove) Id() byte { return 0x21 }
 func (p *EntityLookRelMove) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.X = rw.MustReadByte(r)
 	p.Y = rw.MustReadByte(r)
@@ -1237,8 +1173,6 @@ type EntityTeleport struct {
 func (p EntityTeleport) Id() byte { return 0x22 }
 func (p *EntityTeleport) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadInt(r)
@@ -1273,8 +1207,6 @@ type EntityHeadLook struct {
 func (p EntityHeadLook) Id() byte { return 0x23 }
 func (p *EntityHeadLook) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.HeadYaw = rw.MustReadByte(r)
 
@@ -1301,8 +1233,6 @@ type EntityStatus struct {
 func (p EntityStatus) Id() byte { return 0x26 }
 func (p *EntityStatus) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Status = rw.MustReadByte(r)
 
@@ -1332,8 +1262,6 @@ type EntityAttach struct {
 func (p EntityAttach) Id() byte { return 0x27 }
 func (p *EntityAttach) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.VehicleId = rw.MustReadInt(r)
 
@@ -1360,8 +1288,6 @@ type EntityMetadata struct {
 func (p EntityMetadata) Id() byte { return 0x28 }
 func (p *EntityMetadata) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Meta = rw.MustReadMetadata(r)
 
@@ -1390,8 +1316,6 @@ type EntityEffect struct {
 func (p EntityEffect) Id() byte { return 0x29 }
 func (p *EntityEffect) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Effect = rw.MustReadByte(r)
 	p.Amplifier = rw.MustReadByte(r)
@@ -1422,8 +1346,6 @@ type EntityEffectRemove struct {
 func (p EntityEffectRemove) Id() byte { return 0x2A }
 func (p *EntityEffectRemove) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Effect = rw.MustReadByte(r)
 
@@ -1451,8 +1373,6 @@ type SetExperience struct {
 func (p SetExperience) Id() byte { return 0x2B }
 func (p *SetExperience) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Xp = rw.MustReadFloat(r)
 	p.Level = rw.MustReadShort(r)
 	p.TotalXp = rw.MustReadShort(r)
@@ -1485,8 +1405,6 @@ type ChunkData struct {
 func (p ChunkData) Id() byte { return 0x33 }
 func (p *ChunkData) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Z = rw.MustReadInt(r)
 	p.GroundUpContinuous = rw.MustReadBool(r)
@@ -1540,8 +1458,6 @@ type BlockChangeMulti struct {
 func (p BlockChangeMulti) Id() byte { return 0x34 }
 func (p *BlockChangeMulti) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Z = rw.MustReadInt(r)
 	p.Count = rw.MustReadShort(r)
@@ -1582,8 +1498,6 @@ type BlockChange struct {
 func (p BlockChange) Id() byte { return 0x35 }
 func (p *BlockChange) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadByte(r)
 	p.Z = rw.MustReadInt(r)
@@ -1625,8 +1539,6 @@ type BlockAction struct {
 func (p BlockAction) Id() byte { return 0x36 }
 func (p *BlockAction) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadShort(r)
 	p.Z = rw.MustReadInt(r)
@@ -1662,8 +1574,6 @@ type BlockBreakAnimation struct {
 func (p BlockBreakAnimation) Id() byte { return 0x37 }
 func (p *BlockBreakAnimation) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadInt(r)
@@ -1705,8 +1615,6 @@ type ChunkMeta struct {
 func (p MapChunkBulk) Id() byte { return 0x38 }
 func (p *MapChunkBulk) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Count = rw.MustReadShort(r)
 	p.Length = rw.MustReadInt(r)
 	p.SkylightSent = rw.MustReadBool(r)
@@ -1753,8 +1661,6 @@ type Explosion struct {
 func (p Explosion) Id() byte { return 0x3C }
 func (p *Explosion) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadDouble(r)
 	p.Y = rw.MustReadDouble(r)
 	p.Z = rw.MustReadDouble(r)
@@ -1813,8 +1719,6 @@ type SoundEffect struct {
 func (p SoundEffect) Id() byte { return 0x3D }
 func (p *SoundEffect) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.EffectId = rw.MustReadInt(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadByte(r)
@@ -1851,8 +1755,6 @@ type SoundEffectNamed struct {
 func (p SoundEffectNamed) Id() byte { return 0x3E }
 func (p *SoundEffectNamed) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadInt(r)
@@ -1890,8 +1792,6 @@ type Particle struct {
 func (p Particle) Id() byte { return 0x3F }
 func (p *Particle) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	p.X = rw.MustReadFloat(r)
 	p.Y = rw.MustReadFloat(r)
@@ -1932,8 +1832,6 @@ type GameStateChange struct {
 func (p GameStateChange) Id() byte { return 0x46 }
 func (p *GameStateChange) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Reason = rw.MustReadByte(r)
 	p.GameMode = rw.MustReadByte(r)
 
@@ -1961,8 +1859,6 @@ type EntityGlobalSpawn struct {
 func (p EntityGlobalSpawn) Id() byte { return 0x47 }
 func (p *EntityGlobalSpawn) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Entity = rw.MustReadInt(r)
 	p.Type = rw.MustReadByte(r)
 	p.X = rw.MustReadInt(r)
@@ -1998,8 +1894,6 @@ type WindowOpen struct {
 func (p WindowOpen) Id() byte { return 0x64 }
 func (p *WindowOpen) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.InventoryType = rw.MustReadByte(r)
 	p.WindowTitle = rw.MustReadString(r)
@@ -2031,8 +1925,6 @@ type WindowClose struct {
 func (p WindowClose) Id() byte { return 0x65 }
 func (p *WindowClose) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 
 	return rw.Result()
@@ -2061,8 +1953,6 @@ type WindowClick struct {
 func (p WindowClick) Id() byte { return 0x66 }
 func (p *WindowClick) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Slot = rw.MustReadShort(r)
 	p.Button = rw.MustReadByte(r)
@@ -2098,8 +1988,6 @@ type WindowSlotSet struct {
 func (p WindowSlotSet) Id() byte { return 0x67 }
 func (p *WindowSlotSet) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Slot = rw.MustReadShort(r)
 	p.Data = rw.MustReadSlot(r)
@@ -2129,8 +2017,6 @@ type WindowSetItems struct {
 func (p WindowSetItems) Id() byte { return 0x68 }
 func (p *WindowSetItems) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Count = rw.MustReadShort(r)
 	p.SlotData = make([]*mct.Slot, p.Count)
@@ -2165,8 +2051,6 @@ type WindowUpdateProperty struct {
 func (p WindowUpdateProperty) Id() byte { return 0x69 }
 func (p *WindowUpdateProperty) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Property = rw.MustReadShort(r)
 	p.Value = rw.MustReadShort(r)
@@ -2196,8 +2080,6 @@ type ConfirmTransaction struct {
 func (p ConfirmTransaction) Id() byte { return 0x6A }
 func (p *ConfirmTransaction) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Action = rw.MustReadShort(r)
 	p.Accepted = rw.MustReadBool(r)
@@ -2226,8 +2108,6 @@ type CreativeInventoryAction struct {
 func (p CreativeInventoryAction) Id() byte { return 0x6B }
 func (p *CreativeInventoryAction) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Slot = rw.MustReadShort(r)
 	p.Item = rw.MustReadSlot(r)
 
@@ -2260,8 +2140,6 @@ type EnchantItem struct {
 func (p EnchantItem) Id() byte { return 0x6C }
 func (p *EnchantItem) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.WindowId = rw.MustReadByte(r)
 	p.Position = rw.MustReadByte(r)
 
@@ -2296,8 +2174,6 @@ type SignUpdate struct {
 func (p SignUpdate) Id() byte { return 0x82 }
 func (p *SignUpdate) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadShort(r)
 	p.Z = rw.MustReadInt(r)
@@ -2346,8 +2222,6 @@ type ItemData struct {
 func (p ItemData) Id() byte { return 0x83 }
 func (p *ItemData) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Type = rw.MustReadShort(r)
 	p.ItemId = rw.MustReadShort(r)
 	p.Length = rw.MustReadShort(r)
@@ -2382,8 +2256,6 @@ type TileEntityUpdate struct {
 func (p TileEntityUpdate) Id() byte { return 0x84 }
 func (p *TileEntityUpdate) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.X = rw.MustReadInt(r)
 	p.Y = rw.MustReadShort(r)
 	p.Z = rw.MustReadInt(r)
@@ -2418,8 +2290,6 @@ type StatIncrement struct {
 func (p StatIncrement) Id() byte { return 0xC8 }
 func (p *StatIncrement) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.StatId = rw.MustReadInt(r)
 	p.Amount = rw.MustReadByte(r)
 
@@ -2451,8 +2321,6 @@ type PlayerTabListPing struct {
 func (p PlayerTabListPing) Id() byte { return 0xC9 }
 func (p *PlayerTabListPing) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	p.Online = rw.MustReadBool(r)
 	p.Ping = rw.MustReadShort(r)
@@ -2495,8 +2363,6 @@ type PlayerAbilities struct {
 func (p PlayerAbilities) Id() byte { return 0xCA }
 func (p *PlayerAbilities) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	flags := rw.MustReadByte(r)
 	p.FlyingSpeed = rw.MustReadByte(r)
 	p.WalkingSpeed = rw.MustReadByte(r)
@@ -2544,8 +2410,6 @@ type TabComplete struct {
 func (p TabComplete) Id() byte { return 0xCB }
 func (p *TabComplete) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Text = rw.MustReadString(r)
 
 	return rw.Result()
@@ -2573,8 +2437,6 @@ type ClientSettings struct {
 func (p ClientSettings) Id() byte { return 0xCC }
 func (p *ClientSettings) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Locale = rw.MustReadString(r)
 	p.ViewDistance = rw.MustReadByte(r)
 	p.ChatFlags = rw.MustReadByte(r)
@@ -2606,8 +2468,6 @@ type ClientStatuses struct {
 func (p ClientStatuses) Id() byte { return 0xCD }
 func (p *ClientStatuses) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Payload = rw.MustReadByte(r)
 
 	return rw.Result()
@@ -2633,8 +2493,6 @@ type ScoreObjective struct {
 func (p ScoreObjective) Id() byte { return 0xCE }
 func (p *ScoreObjective) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	p.Value = rw.MustReadString(r)
 	p.Action = rw.MustReadByte(r)
@@ -2665,8 +2523,6 @@ type ScoreUpdate struct {
 func (p ScoreUpdate) Id() byte { return 0xCF }
 func (p *ScoreUpdate) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.EntityName = rw.MustReadString(r)
 	p.Action = rw.MustReadByte(r)
 	p.Objetive = rw.MustReadString(r)
@@ -2697,8 +2553,6 @@ type ScoreDisplay struct {
 func (p ScoreDisplay) Id() byte { return 0xD0 }
 func (p *ScoreDisplay) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Position = rw.MustReadByte(r)
 	p.DisplayName = rw.MustReadString(r)
 
@@ -2729,8 +2583,6 @@ type ScoreTeams struct {
 func (p ScoreTeams) Id() byte { return 0xD1 }
 func (p *ScoreTeams) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	p.Mode = rw.MustReadByte(r)
 	p.DisplayName = rw.MustReadString(r)
@@ -2775,8 +2627,6 @@ type PluginMessage struct {
 func (p PluginMessage) Id() byte { return 0xFA }
 func (p *PluginMessage) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Name = rw.MustReadString(r)
 	length := int(rw.MustReadShort(r))
 	p.Payload = rw.MustReadByteArray(r, length)
@@ -2805,8 +2655,6 @@ type EncryptionKeyResponse struct {
 func (p EncryptionKeyResponse) Id() byte { return 0xFC }
 func (p *EncryptionKeyResponse) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	secretLen := rw.MustReadShort(r)
 	p.Secret = rw.MustReadByteArray(r, int(secretLen))
 	tokenLen := rw.MustReadShort(r)
@@ -2838,8 +2686,6 @@ type EncryptionKeyRequest struct {
 func (p EncryptionKeyRequest) Id() byte { return 0xFD }
 func (p *EncryptionKeyRequest) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.ServerId = rw.MustReadString(r)
 	pkLen := int(rw.MustReadShort(r))
 	p.PublicKey = rw.MustReadByteArray(r, pkLen)
@@ -2871,8 +2717,6 @@ type ServerListPing struct {
 func (p ServerListPing) Id() byte { return 0xFE }
 func (p *ServerListPing) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Magic = rw.MustReadByte(r)
 
 	return rw.Result()
@@ -2896,8 +2740,6 @@ type Disconnect struct {
 func (p Disconnect) Id() byte { return 0xFF }
 func (p *Disconnect) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	// id := rw.MustReadByte(r)
-	// rw.Check(CheckPacketId(id))
 	p.Reason = rw.MustReadString(r)
 
 	return rw.Result()
