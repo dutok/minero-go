@@ -1,13 +1,10 @@
 package minecraft
 
-// Iterate struct fields (type & value) with reflect:
+// Helpers to toy with:
+// - Iterate struct fields (type & value) with reflect:
 // http://play.golang.org/p/BzYrOzevoJ
-
-// Unit vector from pitch + yaw:
+// - Unit vector from pitch + yaw:
 // http://play.golang.org/p/PSh5P13YMJ
-
-// rw.MustRead([a-zA-Z]+)\(w,
-// rw.MustWrite$1(w,
 
 import (
 	"encoding/binary"
