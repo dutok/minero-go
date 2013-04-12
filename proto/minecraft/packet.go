@@ -2645,17 +2645,16 @@ func (p *PluginMessage) WriteTo(w io.Writer) (n int64, err error) {
 // EncryptionKeyResponse is a two-way packet.
 // Total Size: 5 bytes + len(Secret) + len(Token)
 type EncryptionKeyResponse struct {
-	// SecretLength, Tokenlength int16 // stored in slice len fn
 	Secret, Token []byte
 }
 
 func (p EncryptionKeyResponse) Id() byte { return 0xFC }
 func (p *EncryptionKeyResponse) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
-	secretLen := rw.MustReadShort(r)
-	p.Secret = rw.MustReadByteArray(r, int(secretLen))
-	tokenLen := rw.MustReadShort(r)
-	p.Token = rw.MustReadByteArray(r, int(tokenLen))
+	SecretLen := rw.MustReadShort(r)
+	p.Secret = rw.MustReadByteArray(r, int(SecretLen))
+	TokenLen := rw.MustReadShort(r)
+	p.Token = rw.MustReadByteArray(r, int(TokenLen))
 
 	return rw.Result()
 }
@@ -2673,10 +2672,9 @@ func (p *EncryptionKeyResponse) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 // EncryptionKeyRequest is a server to client packet.
-// Total Size: 7 bytes + length of string + length of key + length of token
+// Total Size: 7 bytes + len(ServerId) + len(PublicKey) + len(Token)
 type EncryptionKeyRequest struct {
-	ServerId string
-	// SecretLength, Tokenlength int16 // stored in slice len fn
+	ServerId         string
 	PublicKey, Token []byte
 }
 
@@ -2684,10 +2682,10 @@ func (p EncryptionKeyRequest) Id() byte { return 0xFD }
 func (p *EncryptionKeyRequest) ReadFrom(r io.Reader) (n int64, err error) {
 	rw.Reset()
 	p.ServerId = rw.MustReadString(r)
-	pkLen := int(rw.MustReadShort(r))
-	p.PublicKey = rw.MustReadByteArray(r, pkLen)
-	tokenLen := int(rw.MustReadShort(r))
-	p.Token = rw.MustReadByteArray(r, tokenLen)
+	PublicKeyLen := int(rw.MustReadShort(r))
+	p.PublicKey = rw.MustReadByteArray(r, PublicKeyLen)
+	TokenLen := int(rw.MustReadShort(r))
+	p.Token = rw.MustReadByteArray(r, TokenLen)
 
 	return rw.Result()
 }
