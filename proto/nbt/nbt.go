@@ -91,17 +91,17 @@ func (tt TagType) New() (t Tag) {
 	case TagEnd:
 		t = new(End)
 	case TagByte:
-		t = new(Byte)
+		t = new(Int8)
 	case TagShort:
-		t = new(Short)
+		t = new(Int16)
 	case TagInt:
-		t = new(Int)
+		t = new(Int32)
 	case TagLong:
-		t = new(Long)
+		t = new(Int64)
 	case TagFloat:
-		t = new(Float)
+		t = new(Float32)
 	case TagDouble:
-		t = new(Double)
+		t = new(Float64)
 	case TagByteArray:
 		t = new(ByteArray)
 	case TagString:

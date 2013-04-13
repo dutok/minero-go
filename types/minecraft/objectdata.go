@@ -22,11 +22,11 @@ type ObjectData struct {
 func (o *ObjectData) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw util.RWErrorHandler
 
-	o.Data = rw.MustReadInt(r)
+	o.Data = rw.MustReadInt32(r)
 	if o.Data != 0 {
-		o.SpeedX = rw.MustReadShort(r)
-		o.SpeedY = rw.MustReadShort(r)
-		o.SpeedZ = rw.MustReadShort(r)
+		o.SpeedX = rw.MustReadInt16(r)
+		o.SpeedY = rw.MustReadInt16(r)
+		o.SpeedZ = rw.MustReadInt16(r)
 	}
 
 	return rw.Result()
@@ -35,11 +35,11 @@ func (o *ObjectData) ReadFrom(r io.Reader) (n int64, err error) {
 func (o *ObjectData) WriteTo(w io.Writer) (n int64, err error) {
 	var rw util.RWErrorHandler
 
-	rw.MustWriteInt(w, o.Data)
+	rw.MustWriteInt32(w, o.Data)
 	if o.Data != 0 {
-		rw.MustWriteShort(w, o.SpeedX)
-		rw.MustWriteShort(w, o.SpeedY)
-		rw.MustWriteShort(w, o.SpeedZ)
+		rw.MustWriteInt16(w, o.SpeedX)
+		rw.MustWriteInt16(w, o.SpeedY)
+		rw.MustWriteInt16(w, o.SpeedZ)
 	}
 
 	return rw.Result()

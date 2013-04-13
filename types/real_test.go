@@ -13,7 +13,7 @@ func TestFloat(t *testing.T) {
 	)
 
 	f := func(v float32) bool {
-		value := Float(v)
+		value := Float32(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {
@@ -40,7 +40,7 @@ func TestDouble(t *testing.T) {
 	)
 
 	f := func(v float64) bool {
-		value := Double(v)
+		value := Float64(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {

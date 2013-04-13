@@ -13,7 +13,7 @@ func TestByte(t *testing.T) {
 	)
 
 	f := func(v int8) bool {
-		value := Byte(v)
+		value := Int8(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {
@@ -40,7 +40,7 @@ func TestShort(t *testing.T) {
 	)
 
 	f := func(v int16) bool {
-		value := Short(v)
+		value := Int16(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {
@@ -67,7 +67,7 @@ func TestInt(t *testing.T) {
 	)
 
 	f := func(v int32) bool {
-		value := Int(v)
+		value := Int32(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {
@@ -94,7 +94,7 @@ func TestLong(t *testing.T) {
 	)
 
 	f := func(v int64) bool {
-		value := Long(v)
+		value := Int64(v)
 
 		_, err = value.WriteTo(&buf)
 		if err != nil {

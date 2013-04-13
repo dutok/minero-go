@@ -28,11 +28,11 @@ type InfoSlot struct {
 func (s *Slot) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw util.RWErrorHandler
 
-	s.BlockId = rw.MustReadShort(r)
+	s.BlockId = rw.MustReadInt16(r)
 	if s.BlockId != -1 {
-		s.Amount = byte(rw.MustReadByte(r))
-		s.Damage = rw.MustReadShort(r)
-		s.Length = rw.MustReadShort(r)
+		s.Amount = byte(rw.MustReadInt8(r))
+		s.Damage = rw.MustReadInt16(r)
+		s.Length = rw.MustReadInt16(r)
 	}
 
 	if s.Length != -1 {
@@ -52,11 +52,11 @@ func (s *Slot) ReadFrom(r io.Reader) (n int64, err error) {
 func (s *Slot) WriteTo(w io.Writer) (n int64, err error) {
 	var rw util.RWErrorHandler
 
-	rw.MustWriteShort(w, s.BlockId)
+	rw.MustWriteInt16(w, s.BlockId)
 	if s.BlockId != -1 {
-		rw.MustWriteByte(w, int8(s.Amount))
-		rw.MustWriteShort(w, s.Damage)
-		rw.MustWriteShort(w, s.Length)
+		rw.MustWriteInt8(w, int8(s.Amount))
+		rw.MustWriteInt16(w, s.Damage)
+		rw.MustWriteInt16(w, s.Length)
 	}
 
 	// BUG(toqueteos): Write Compound as byte stream, then gzip it

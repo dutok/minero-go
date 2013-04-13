@@ -41,7 +41,7 @@ func (l *List) ReadFrom(r io.Reader) (n int64, err error) {
 	n += nn
 
 	// Read length-prefix
-	var length Int
+	var length Int32
 	nn, err = length.ReadFrom(r)
 	if err != nil {
 		return
@@ -49,8 +49,8 @@ func (l *List) ReadFrom(r io.Reader) (n int64, err error) {
 	n += nn
 
 	// Read list items
-	if length.Int > 0 {
-		l.Value = make([]Tag, length.Int)
+	if length.Int32 > 0 {
+		l.Value = make([]Tag, length.Int32)
 		for index, elem := range l.Value {
 			elem = l.Typ.New()
 			nn, err = elem.ReadFrom(r)
@@ -71,13 +71,13 @@ func (l *List) WriteTo(w io.Writer) (n int64, err error) {
 	var nn int64
 
 	// Write TagType prefix
-	tt := types.Byte(l.Typ)
+	tt := types.Int8(l.Typ)
 	if nn, err = tt.WriteTo(w); err != nil {
 		return
 	}
 	n += nn
 
-	length := types.Int(len(l.Value))
+	length := types.Int32(len(l.Value))
 	if nn, err = length.WriteTo(w); err != nil {
 		return
 	}

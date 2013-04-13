@@ -9,20 +9,20 @@ import (
 
 func NewByteArray(s []int8) *ByteArray {
 	b := &ByteArray{
-		Value: make([]types.Byte, len(s)),
+		Value: make([]types.Int8, len(s)),
 	}
 	for index, elem := range s {
-		b.Value[index] = types.Byte(elem)
+		b.Value[index] = types.Int8(elem)
 	}
 	return b
 }
 
 func NewIntArray(s []int32) *IntArray {
 	b := &IntArray{
-		Value: make([]types.Int, len(s)),
+		Value: make([]types.Int32, len(s)),
 	}
 	for index, elem := range s {
-		b.Value[index] = types.Int(elem)
+		b.Value[index] = types.Int32(elem)
 	}
 	return b
 }
@@ -31,7 +31,7 @@ func NewIntArray(s []int32) *IntArray {
 // signed integer (4 bytes).
 // TagType: 7, Size: 4 + elem * 1 bytes
 type ByteArray struct {
-	Value []types.Byte
+	Value []types.Int8
 }
 
 func (arr ByteArray) Type() TagType          { return TagByteArray }
@@ -47,7 +47,7 @@ func (arr *ByteArray) ReadFrom(r io.Reader) (n int64, err error) {
 	var nn int64
 
 	// Read length-prefix
-	var length Int
+	var length Int32
 	nn, err = length.ReadFrom(r)
 	if err != nil {
 		return
@@ -55,7 +55,7 @@ func (arr *ByteArray) ReadFrom(r io.Reader) (n int64, err error) {
 	n += nn
 
 	// Read length bytes
-	arr.Value = make([]types.Byte, length.Int)
+	arr.Value = make([]types.Int8, length.Int32)
 	for index, elem := range arr.Value {
 		nn, err = elem.ReadFrom(r)
 		if err != nil {
@@ -73,7 +73,7 @@ func (arr *ByteArray) WriteTo(w io.Writer) (n int64, err error) {
 	var nn int64
 
 	// Write length-prefix
-	var length = types.Int(len(arr.Value))
+	var length = types.Int32(len(arr.Value))
 	nn, err = length.WriteTo(w)
 	if err != nil {
 		return
@@ -96,7 +96,7 @@ func (arr *ByteArray) WriteTo(w io.Writer) (n int64, err error) {
 // signed integer (4 bytes) and indicates the number of 4 byte integers.
 // TagType: 11, Size: 4 + 4 * elem
 type IntArray struct {
-	Value []types.Int
+	Value []types.Int32
 }
 
 func (arr IntArray) Type() TagType          { return TagIntArray }
@@ -111,7 +111,7 @@ func (arr *IntArray) ReadFrom(r io.Reader) (n int64, err error) {
 	var nn int64
 
 	// Read length-prefix
-	var length Int
+	var length Int32
 	nn, err = length.ReadFrom(r)
 	if err != nil {
 		return
@@ -119,7 +119,7 @@ func (arr *IntArray) ReadFrom(r io.Reader) (n int64, err error) {
 	n += nn
 
 	// Read length bytes
-	arr.Value = make([]types.Int, length.Int)
+	arr.Value = make([]types.Int32, length.Int32)
 	for index, elem := range arr.Value {
 		nn, err = elem.ReadFrom(r)
 		if err != nil {
@@ -137,7 +137,7 @@ func (arr *IntArray) WriteTo(w io.Writer) (n int64, err error) {
 	var nn int64
 
 	// Write length-prefix
-	var length = types.Int(len(arr.Value))
+	var length = types.Int32(len(arr.Value))
 	nn, err = length.WriteTo(w)
 	if err != nil {
 		return

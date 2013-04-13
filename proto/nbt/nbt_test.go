@@ -30,7 +30,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Byte{0x11},
+				"test": &Int8{0x11},
 			},
 		},
 		nil,
@@ -44,7 +44,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Short{0x1122},
+				"test": &Int16{0x1122},
 			},
 		},
 		nil,
@@ -58,7 +58,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Int{0x11223344},
+				"test": &Int32{0x11223344},
 			},
 		},
 		nil,
@@ -72,7 +72,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Long{0x1122334455667788},
+				"test": &Int64{0x1122334455667788},
 			},
 		},
 		nil,
@@ -86,7 +86,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Float{12345.6789},
+				"test": &Float32{12345.6789},
 			},
 		},
 		nil,
@@ -100,7 +100,7 @@ var simpleTests = []struct {
 		&Compound{
 			Name: "",
 			Value: map[string]Tag{
-				"test": &Double{12345.6789},
+				"test": &Float64{12345.6789},
 			},
 		},
 		nil,
@@ -146,7 +146,7 @@ var simpleTests = []struct {
 				"test": &List{
 					Typ: TagShort,
 					Value: []Tag{
-						&Short{0x12}, &Short{0x34}, &Short{0x56}, &Short{0x78},
+						&Int16{0x12}, &Int16{0x34}, &Int16{0x56}, &Int16{0x78},
 					},
 				},
 			},
@@ -166,7 +166,7 @@ var simpleTests = []struct {
 				"test": &Compound{
 					Name: "test",
 					Value: map[string]Tag{
-						"long": &Long{0x0112233445566778},
+						"long": &Int64{0x0112233445566778},
 					},
 				},
 			},

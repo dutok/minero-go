@@ -8,22 +8,22 @@ import (
 
 // Float holds a single IEEE-754 single-precision floating point number.
 // TagType: 5, Size: 4 bytes
-type Float struct {
-	types.Float
+type Float32 struct {
+	types.Float32
 }
 
-func (f Float) Type() TagType          { return TagFloat }
-func (f Float) Size() int64            { return 4 }
-func (f Float) Lookup(path string) Tag { return nil }
-func (f Float) String() string         { return fmt.Sprintf("NBT_Float %f", f) }
+func (f Float32) Type() TagType          { return TagFloat }
+func (f Float32) Size() int64            { return 4 }
+func (f Float32) Lookup(path string) Tag { return nil }
+func (f Float32) String() string         { return fmt.Sprintf("NBT_Float %f", f) }
 
 // Double holds a single IEEE-754 double-precision floating point number.
 // TagType: 6, Size: 8 bytes
-type Double struct {
-	types.Double
+type Float64 struct {
+	types.Float64
 }
 
-func (d Double) Type() TagType          { return TagDouble }
-func (d Double) Size() int64            { return 8 }
-func (d Double) Lookup(path string) Tag { return nil }
-func (d Double) String() string         { return fmt.Sprintf("NBT_Double %f", d) }
+func (d Float64) Type() TagType          { return TagDouble }
+func (d Float64) Size() int64            { return 8 }
+func (d Float64) Lookup(path string) Tag { return nil }
+func (d Float64) String() string         { return fmt.Sprintf("NBT_Double %f", d) }

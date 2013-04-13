@@ -106,13 +106,13 @@ func (m *Metadata) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-type EntryByte struct{ types.Byte }
-type EntryShort struct{ types.Short }
-type EntryInt struct{ types.Int }
-type EntryFloat struct{ types.Float }
+type EntryByte struct{ types.Int8 }
+type EntryShort struct{ types.Int16 }
+type EntryInt struct{ types.Int32 }
+type EntryFloat struct{ types.Float32 }
 type EntryString struct{ String }
 type EntrySlot struct{ Slot }
-type EntryVector struct{ Data [3]types.Int }
+type EntryVector struct{ Data [3]types.Int32 }
 
 func (e EntryByte) Type() byte   { return 0 }
 func (e EntryShort) Type() byte  { return 1 }

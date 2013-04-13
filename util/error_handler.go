@@ -47,12 +47,12 @@ func (rw *RWErrorHandler) Reset() {
 	rw.Err = nil
 }
 
-func (rw *RWErrorHandler) MustReadByte(r io.Reader) (v int8) {
+func (rw *RWErrorHandler) MustReadInt8(r io.Reader) (v int8) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Byte
+	var t types.Int8
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadByte: %v", err)
@@ -63,12 +63,12 @@ func (rw *RWErrorHandler) MustReadByte(r io.Reader) (v int8) {
 	return int8(t)
 }
 
-func (rw *RWErrorHandler) MustReadShort(r io.Reader) (v int16) {
+func (rw *RWErrorHandler) MustReadInt16(r io.Reader) (v int16) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Short
+	var t types.Int16
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadShort: %v", err)
@@ -79,12 +79,12 @@ func (rw *RWErrorHandler) MustReadShort(r io.Reader) (v int16) {
 	return int16(t)
 }
 
-func (rw *RWErrorHandler) MustReadInt(r io.Reader) (v int32) {
+func (rw *RWErrorHandler) MustReadInt32(r io.Reader) (v int32) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Int
+	var t types.Int32
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadInt: %v", err)
@@ -95,12 +95,12 @@ func (rw *RWErrorHandler) MustReadInt(r io.Reader) (v int32) {
 	return int32(t)
 }
 
-func (rw *RWErrorHandler) MustReadLong(r io.Reader) (v int64) {
+func (rw *RWErrorHandler) MustReadInt64(r io.Reader) (v int64) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Long
+	var t types.Int64
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadLong: %v", err)
@@ -111,12 +111,12 @@ func (rw *RWErrorHandler) MustReadLong(r io.Reader) (v int64) {
 	return int64(t)
 }
 
-func (rw *RWErrorHandler) MustReadFloat(r io.Reader) (v float32) {
+func (rw *RWErrorHandler) MustReadFloat32(r io.Reader) (v float32) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Float
+	var t types.Float32
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadFloat: %v", err)
@@ -127,12 +127,12 @@ func (rw *RWErrorHandler) MustReadFloat(r io.Reader) (v float32) {
 	return float32(t)
 }
 
-func (rw *RWErrorHandler) MustReadDouble(r io.Reader) (v float64) {
+func (rw *RWErrorHandler) MustReadFloat64(r io.Reader) (v float64) {
 	if rw.Err != nil {
 		return v
 	}
 
-	var t types.Double
+	var t types.Float64
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadDouble: %v", err)
@@ -159,12 +159,12 @@ func (rw *RWErrorHandler) MustReadByteArray(r io.Reader, length int) (v []byte) 
 	return buf.Bytes()
 }
 
-func (rw *RWErrorHandler) MustWriteByte(w io.Writer, value int8) {
+func (rw *RWErrorHandler) MustWriteInt8(w io.Writer, value int8) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Byte(value)
+	t := types.Int8(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustWriteByte: %v", err)
@@ -173,12 +173,12 @@ func (rw *RWErrorHandler) MustWriteByte(w io.Writer, value int8) {
 	rw.N += n
 }
 
-func (rw *RWErrorHandler) MustWriteShort(w io.Writer, value int16) {
+func (rw *RWErrorHandler) MustWriteInt16(w io.Writer, value int16) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Short(value)
+	t := types.Int16(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustReadShort: %v", err)
@@ -187,12 +187,12 @@ func (rw *RWErrorHandler) MustWriteShort(w io.Writer, value int16) {
 	rw.N += n
 }
 
-func (rw *RWErrorHandler) MustWriteInt(w io.Writer, value int32) {
+func (rw *RWErrorHandler) MustWriteInt32(w io.Writer, value int32) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Int(value)
+	t := types.Int32(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustWriteInt: %v", err)
@@ -201,12 +201,12 @@ func (rw *RWErrorHandler) MustWriteInt(w io.Writer, value int32) {
 	rw.N += n
 }
 
-func (rw *RWErrorHandler) MustWriteLong(w io.Writer, value int64) {
+func (rw *RWErrorHandler) MustWriteInt64(w io.Writer, value int64) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Long(value)
+	t := types.Int64(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustWriteLong: %v", err)
@@ -215,12 +215,12 @@ func (rw *RWErrorHandler) MustWriteLong(w io.Writer, value int64) {
 	rw.N += n
 }
 
-func (rw *RWErrorHandler) MustWriteFloat(w io.Writer, value float32) {
+func (rw *RWErrorHandler) MustWriteFloat32(w io.Writer, value float32) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Float(value)
+	t := types.Float32(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustWriteFloat: %v", err)
@@ -229,12 +229,12 @@ func (rw *RWErrorHandler) MustWriteFloat(w io.Writer, value float32) {
 	rw.N += n
 }
 
-func (rw *RWErrorHandler) MustWriteDouble(w io.Writer, value float64) {
+func (rw *RWErrorHandler) MustWriteFloat64(w io.Writer, value float64) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := types.Double(value)
+	t := types.Float64(value)
 	n, err := t.WriteTo(w)
 	if err != nil {
 		rw.Err = fmt.Errorf("MustWriteDouble: %v", err)
