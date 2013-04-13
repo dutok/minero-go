@@ -7,25 +7,40 @@ import (
 )
 
 func TestString(t *testing.T) {
+	var (
+		buf bytes.Buffer
+		err error
+	)
+
 	f := func(v string) bool {
-		var (
-			mcs = String(v)
-			buf bytes.Buffer
-		)
+		// Thanks to andrey mirtchovski for pointing out this:
+		// https://groups.google.com/d/msg/golang-nuts/qeEvnU0yUr4/t5cMJCdPSNsJ
+		// http://en.wikipedia.org/wiki/Mapping_of_Unicode_characters#Surrogates
+		var rs []rune
+		for _, r := range v {
+			switch {
+			case r >= 0xD800 && r <= 0xDBFF:
+				continue
+			case r >= 0xDC00 && r <= 0xDFFF:
+				continue
+			}
+			rs = append(rs, r)
+		}
+		v = string(rs)
 
-		wn, err := mcs.WriteTo(&buf)
+		value := String(v)
+
+		_, err = value.WriteTo(&buf)
 		if err != nil {
 			t.Error(err)
 		}
 
-		rn, err := mcs.ReadFrom(&buf)
+		_, err = value.ReadFrom(&buf)
 		if err != nil {
 			t.Error(err)
 		}
 
-		// Can't check string equality, quick may generate weird codepoints
-		return len(v) == len(mcs.String())
-		// return v == mcs.String()
+		return v == string(value)
 	}
 
 	if err := quick.Check(f, nil); err != nil {
