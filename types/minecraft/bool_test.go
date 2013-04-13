@@ -7,23 +7,25 @@ import (
 )
 
 func TestBool(t *testing.T) {
+	var (
+		buf bytes.Buffer
+		err error
+	)
+
 	f := func(v bool) bool {
-		var (
-			b   = Bool(v)
-			buf bytes.Buffer
-		)
+		value := Bool(v)
 
-		wn, err := b.WriteTo(&buf)
+		_, err = value.WriteTo(&buf)
 		if err != nil {
 			t.Error(err)
 		}
 
-		rn, err := b.ReadFrom(&buf)
+		_, err = value.ReadFrom(&buf)
 		if err != nil {
 			t.Error(err)
 		}
 
-		return v == bool(b)
+		return v == bool(value)
 	}
 
 	if err := quick.Check(f, nil); err != nil {
