@@ -48,8 +48,6 @@ func (m *String) WriteTo(w io.Writer) (n int64, err error) {
 	return int64(2 + length*2), nil
 }
 
-// func (m *String) Read(p []byte) (n int, err error) {}
-// func (m *String) Write(p []byte) (n int, err error) {}
 func (m String) String() string {
 	return string(m)
 }
