@@ -7,7 +7,7 @@ const (
 )
 
 // IsHardcore returns true if gamemode has the hardcore flag, false otherwise.
-func IsHardcore() bool {
+func IsHardcore(d int) bool {
 	return d&0x8 == 0x8
 }
 
