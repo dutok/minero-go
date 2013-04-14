@@ -1,38 +1,18 @@
+// Package minecraft implements server list ping of Minecraft Protocol.
+//
+// Many, many thanks to #mcdevs from Freenode and it's great documentation:
+// http://wiki.vg/Server_List_Ping
 package ping
 
 import (
-	"bytes"
-	"encoding/binary"
 	"strings"
 	"unicode/utf16"
 
 	"github.com/toqueteos/minero/proto/packet"
 )
 
-// Ping prepares an 0xFF packet
-func Ping(ping []string) packet. {
-	// Write Disconnect packet Id (byte)
-	buf := bytes.NewBuffer([]byte{0xff})
-
-	// Write length of string (short)
-	payload := prepare(ping)
-	length := uint16(len(payload) / 2)      // 2 bytes
-	buf.WriteByte(byte(length >> 8 & 0xFF)) // left byte
-	buf.WriteByte(byte(length & 0xFF))      // right byte
-	buf.Write(payload)
-
-	return buf.Bytes()
-}
-
-func prepare(ping []string) []byte {
-	var payload bytes.Buffer
-
-	s := strings.Join(ping, "\x00")
-	ucs2 := utf16.Encode([]rune(s))
-	err := binary.Write(&payload, binary.BigEndian, ucs2)
-	if err != nil {
-		return nil
-	}
-
-	return payload.Bytes()
+// Ping returns a 0xFF packet containing the response to a 0xFE (ServerListPing)
+// packet. For more info check package docs.
+func Ping(s []string) *packet.Disconnect {
+	return &packet.Disconnect{Reason: strings.Join(s, "\x00")}
 }
