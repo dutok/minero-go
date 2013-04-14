@@ -1,5 +1,4 @@
-// Fake Minecraft server list server. Doesn't require any other packages, this
-// may change in the future.
+// Fake Minecraft server list server.
 package main
 
 import (
@@ -7,10 +6,18 @@ import (
 	"log"
 )
 
+var Flags [6]string
+
 func init() {
 	log.SetPrefix("sld> ")
 	log.SetFlags(log.Ltime)
 
+	Flags[0] = "§1"
+	flag.StringVar(&Flags[1], "proto", "60", "")
+	flag.StringVar(&Flags[2], "server", "1.5", "")
+	flag.StringVar(&Flags[3], "motd", "§9minero§r Server", "")
+	flag.StringVar(&Flags[4], "n", "0", "")
+	flag.StringVar(&Flags[5], "m", "64", "")
 	flag.Parse()
 }
 
