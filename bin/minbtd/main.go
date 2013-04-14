@@ -1,7 +1,9 @@
+// NBT pretty printer.
 package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -11,26 +13,20 @@ import (
 	"github.com/toqueteos/minero/proto/nbt"
 )
 
-type Flags struct {
+var Flags struct {
 	Quiet bool
-}
-
-var flags = new(Flags)
-
-func usage() {
-	os.Stderr.WriteString("Usage: nbtdebug nbtfile")
 }
 
 func init() {
 	log.SetFlags(0)
-	log.SetPrefix("nbtdebug> ")
-	flag.BoolVar(&flags.Quiet, "q", false, "")
+	log.SetPrefix("minbtd> ")
+	flag.BoolVar(&Flags.Quiet, "q", false, "")
 	flag.Parse()
 }
 
 func main() {
 	if flag.NArg() != 1 {
-		usage()
+		fmt.Println("Usage: minbtd file")
 		return
 	}
 
@@ -49,8 +45,8 @@ func main() {
 		gzip  bool
 	)
 
-	if !flags.Quiet {
-		r = iotest.NewReadLogger("nbtdebug:", file)
+	if !Flags.Quiet {
+		r = iotest.NewReadLogger("r:", file)
 	} else {
 		r = file
 	}
