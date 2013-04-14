@@ -5,10 +5,12 @@ import (
 	"encoding/binary"
 	"strings"
 	"unicode/utf16"
+
+	"github.com/toqueteos/minero/proto/packet"
 )
 
 // Ping prepares an 0xFF packet
-func Ping(ping []string) []byte {
+func Ping(ping []string) packet. {
 	// Write Disconnect packet Id (byte)
 	buf := bytes.NewBuffer([]byte{0xff})
 

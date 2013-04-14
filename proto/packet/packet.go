@@ -1,4 +1,4 @@
-package minecraft
+package packet
 
 // Helpers to toy with:
 // - Iterate struct fields (type & value) with reflect:

@@ -1,4 +1,4 @@
-package minecraft
+package packet
 
 const (
 	PacketKeepAlive          byte = iota
