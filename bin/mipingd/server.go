@@ -5,8 +5,8 @@ import (
 	"net"
 	"strings"
 
-	packet "github.com/toqueteos/minero/proto/minecraft"
-	"github.com/toqueteos/minero/proto/minecraft/ping"
+	"github.com/toqueteos/minero/proto/packet"
+	"github.com/toqueteos/minero/proto/ping"
 )
 
 func Server(addr string) {
@@ -49,11 +49,6 @@ func handle(c net.Conn) {
 	}
 
 	// Send response
-	p := packet.Disconnect{
-		Reason: strings.Join(Flags[:], "\x00\x00"),
-	}
-	_ = p
-	// p.WriteTo(c)
-
-	c.Write(ping.Ping(Flags[:]))
+	p := ping.Ping(Flags[:])
+	p.WriteTo(c)
 }

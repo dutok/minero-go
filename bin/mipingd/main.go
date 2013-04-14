@@ -1,4 +1,4 @@
-// Fake Minecraft server list server.
+// Server list ping client & server.
 package main
 
 import (
@@ -9,7 +9,7 @@ import (
 var Flags [6]string
 
 func init() {
-	log.SetPrefix("sld> ")
+	log.SetPrefix("mipingd> ")
 	log.SetFlags(log.Ltime)
 
 	Flags[0] = "§1"
