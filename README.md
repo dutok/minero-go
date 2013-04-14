@@ -3,12 +3,14 @@ Minero
 
 Minero is an implementation of the Multiplayer Server for [Minecraft](http://minecraft.net) made in [Go](http://golang.org). It aims to fully support Minecraft 1.5.1 version.
 
-It is licensed under the MIT open source license, please see the [LICENSE.txt](https://github.com/toqueteos/minero/blob/master/LICENSE.txt) file for more information.
+It is licensed under the MIT open source license, please read the [LICENSE.txt](https://github.com/toqueteos/minero/blob/master/LICENSE.txt) file for more information.
 
 Requirements
 ============
 
-Right now it's aimed for: `go version go1.0.3`.
+Just Go, also Git (encouraged) if you want to use `go get`.
+
+More specifically aimed for: `go version go1.0.3`.
 
 You can check your Go version typing `go version` on the terminal. If it outputs an error you don't have Go installed.
 
@@ -17,18 +19,26 @@ Go to [Go's install page](http://golang.org/doc/install) **Download the Go tools
 Features
 ========
 
-- NBT v19133 support.
-    - minbtd command on [`bin/minbtd`](https://github.com/toqueteos/minero/blob/master/bin/minbtd).
 - Basic [data types](http://wiki.vg/Data_Types) support (bool, byte, short, int, long, float, double and string). See [`types`](https://github.com/toqueteos/minero/blob/master/types), [`types/nbt`](https://github.com/toqueteos/minero/blob/master/types/nbt) and [`types/minecraft`](https://github.com/toqueteos/minero/blob/master/types/minecraft).
+- NBT v19133 support.
 - Proxy with logging support available.
-    - miproxy command on [`bin/miproxy`](https://github.com/toqueteos/minero/blob/master/bin/miproxy).
-- Fake Minecraft server list server.
-    - mipingd command on [`bin/mipingd`](https://github.com/toqueteos/minero/blob/master/bin/mipingd).
+- Server list ping client & server (ping other servers, fake a server).
 
-Instructions
-============
+Tools
+=====
+- NBT pretty printer: [`bin/minbtd`](https://github.com/toqueteos/minero/blob/master/bin/minbtd)
 
-Commands can be installed with `go install`.
+        go get github.com/toqueteos/minero/bin/minbtd
 
-- Copy & Paste fans: `go get github.com/toqueteos/minero/bin/<cmdName>`
-- Working example: `go get github.com/toqueteos/minero/bin/minbtd`
+- Server proxy with logging support: [`bin/miproxy`](https://github.com/toqueteos/minero/blob/master/bin/miproxy)
+
+        go get github.com/toqueteos/minero/bin/miproxy
+
+- Server list ping client & server: [`bin/mipingd`](https://github.com/toqueteos/minero/blob/master/bin/mipingd)
+
+        go get github.com/toqueteos/minero/bin/mipingd
+
+Notes
+=====
+
+Everything can be go-get'd.
