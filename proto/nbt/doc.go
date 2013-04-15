@@ -1,4 +1,4 @@
-// Package nbt implements functions for the manipulation of NBT files.
+// Package nbt implements NBT read/write file support.
 //
 // Its based heavily onthe io.ReaderFrom and io.WriteTo interfaces, so you can
 // just use io.Copy to read and write NBT streams.
