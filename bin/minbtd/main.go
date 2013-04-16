@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 	"testing/iotest"
 
 	"github.com/toqueteos/minero/proto/nbt"
@@ -88,9 +87,6 @@ func Debug(f io.Reader) {
 		log.Fatalln("nbt.Read:", err)
 	}
 
-	log.Println("Top level compound name:", c.Name)
-	for k, v := range c.Value {
-		parts := strings.SplitN(k, " ", 2)
-		log.Printf("%q: %v\n", parts[0], v)
-	}
+	log.Printf("Top level compound name: %q\n", c.Name)
+	fmt.Println(nbt.Pretty(c.String()))
 }
