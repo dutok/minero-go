@@ -3,16 +3,14 @@ package minecraft
 import (
 	"bytes"
 	"compress/gzip"
-	"github.com/toqueteos/minero/proto/nbt"
 	"io"
 
-	// "github.com/toqueteos/minero/proto/nbt"
-	"github.com/toqueteos/minero/util"
+	"github.com/toqueteos/minero/proto/nbt"
+	"github.com/toqueteos/minero/util/must"
 )
 
-// http://wiki.vg/Slot_Data
-
 // Slot
+// http://wiki.vg/Slot_Data
 type Slot struct {
 	BlockId int16
 	*InfoSlot
@@ -26,13 +24,13 @@ type InfoSlot struct {
 }
 
 func (s *Slot) ReadFrom(r io.Reader) (n int64, err error) {
-	var rw util.RWErrorHandler
+	var rw must.ReadWriter
 
-	s.BlockId = rw.MustReadInt16(r)
+	s.BlockId = rw.ReadInt16(r)
 	if s.BlockId != -1 {
-		s.Amount = byte(rw.MustReadInt8(r))
-		s.Damage = rw.MustReadInt16(r)
-		s.Length = rw.MustReadInt16(r)
+		s.Amount = byte(rw.ReadInt8(r))
+		s.Damage = rw.ReadInt16(r)
+		s.Length = rw.ReadInt16(r)
 	}
 
 	if s.Length != -1 {
@@ -50,13 +48,13 @@ func (s *Slot) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (s *Slot) WriteTo(w io.Writer) (n int64, err error) {
-	var rw util.RWErrorHandler
+	var rw must.ReadWriter
 
-	rw.MustWriteInt16(w, s.BlockId)
+	rw.WriteInt16(w, s.BlockId)
 	if s.BlockId != -1 {
-		rw.MustWriteInt8(w, int8(s.Amount))
-		rw.MustWriteInt16(w, s.Damage)
-		rw.MustWriteInt16(w, s.Length)
+		rw.WriteInt8(w, int8(s.Amount))
+		rw.WriteInt16(w, s.Damage)
+		rw.WriteInt16(w, s.Length)
 	}
 
 	// BUG(toqueteos): Write Compound as byte stream, then gzip it

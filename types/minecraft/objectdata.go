@@ -1,8 +1,9 @@
 package minecraft
 
 import (
-	"github.com/toqueteos/minero/util"
 	"io"
+
+	"github.com/toqueteos/minero/util/must"
 )
 
 // ObjectData is a special data type for packet 0x17.
@@ -20,26 +21,26 @@ type ObjectData struct {
 }
 
 func (o *ObjectData) ReadFrom(r io.Reader) (n int64, err error) {
-	var rw util.RWErrorHandler
+	var rw must.ReadWriter
 
-	o.Data = rw.MustReadInt32(r)
+	o.Data = rw.ReadInt32(r)
 	if o.Data != 0 {
-		o.SpeedX = rw.MustReadInt16(r)
-		o.SpeedY = rw.MustReadInt16(r)
-		o.SpeedZ = rw.MustReadInt16(r)
+		o.SpeedX = rw.ReadInt16(r)
+		o.SpeedY = rw.ReadInt16(r)
+		o.SpeedZ = rw.ReadInt16(r)
 	}
 
 	return rw.Result()
 }
 
 func (o *ObjectData) WriteTo(w io.Writer) (n int64, err error) {
-	var rw util.RWErrorHandler
+	var rw must.ReadWriter
 
-	rw.MustWriteInt32(w, o.Data)
+	rw.WriteInt32(w, o.Data)
 	if o.Data != 0 {
-		rw.MustWriteInt16(w, o.SpeedX)
-		rw.MustWriteInt16(w, o.SpeedY)
-		rw.MustWriteInt16(w, o.SpeedZ)
+		rw.WriteInt16(w, o.SpeedX)
+		rw.WriteInt16(w, o.SpeedY)
+		rw.WriteInt16(w, o.SpeedZ)
 	}
 
 	return rw.Result()
