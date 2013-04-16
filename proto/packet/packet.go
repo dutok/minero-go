@@ -14,9 +14,6 @@ import (
 	mct "github.com/toqueteos/minero/types/minecraft"
 )
 
-// Global io error handler
-var rw PacketErrorHandler
-
 type Packet interface {
 	Id() byte
 	io.ReaderFrom
@@ -53,16 +50,16 @@ type KeepAlive struct {
 
 func (p KeepAlive) Id() byte { return 0x00 }
 func (p *KeepAlive) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.RandomId = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.RandomId = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 func (p *KeepAlive) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.RandomId)
+	rw.WriteInt32(w, p.RandomId)
 
 	return rw.Result()
 }
@@ -82,26 +79,26 @@ type LoginInfo struct {
 
 func (p LoginInfo) Id() byte { return 0x01 }
 func (p *LoginInfo) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.LevelType = rw.MustReadString(r)
-	p.GameMode = rw.MustReadInt8(r)
-	p.Dimension = rw.MustReadInt8(r)
-	p.Difficulty = rw.MustReadInt8(r)
-	_ = rw.MustReadInt8(r)
-	p.MaxPlayers = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.LevelType = rw.ReadString(r)
+	p.GameMode = rw.ReadInt8(r)
+	p.Dimension = rw.ReadInt8(r)
+	p.Difficulty = rw.ReadInt8(r)
+	_ = rw.ReadInt8(r)
+	p.MaxPlayers = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 func (p *LoginInfo) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.LevelType)
-	rw.MustWriteInt8(w, p.GameMode)
-	rw.MustWriteInt8(w, p.Dimension)
-	rw.MustWriteInt8(w, p.Difficulty)
-	rw.MustWriteInt8(w, 0) // see LoginInfo._WorldHeight
-	rw.MustWriteInt8(w, p.MaxPlayers)
+	rw.WriteString(w, p.LevelType)
+	rw.WriteInt8(w, p.GameMode)
+	rw.WriteInt8(w, p.Dimension)
+	rw.WriteInt8(w, p.Difficulty)
+	rw.WriteInt8(w, 0) // see LoginInfo._WorldHeight
+	rw.WriteInt8(w, p.MaxPlayers)
 
 	return rw.Result()
 }
@@ -118,22 +115,22 @@ type Handshake struct {
 
 func (p Handshake) Id() byte { return 0x02 }
 func (p *Handshake) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Version = rw.MustReadInt8(r)
-	p.Username = rw.MustReadString(r)
-	p.Host = rw.MustReadString(r)
-	p.Port = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Version = rw.ReadInt8(r)
+	p.Username = rw.ReadString(r)
+	p.Host = rw.ReadString(r)
+	p.Port = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 func (p *Handshake) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Version)
-	rw.MustWriteString(w, p.Username)
-	rw.MustWriteString(w, p.Host)
-	rw.MustWriteInt32(w, p.Port)
+	rw.WriteInt8(w, p.Version)
+	rw.WriteString(w, p.Username)
+	rw.WriteString(w, p.Host)
+	rw.WriteInt32(w, p.Port)
 
 	return rw.Result()
 }
@@ -155,16 +152,16 @@ type ChatMessage struct {
 
 func (p ChatMessage) Id() byte { return 0x03 }
 func (p *ChatMessage) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Message = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.Message = rw.ReadString(r)
 
 	return rw.Result()
 }
 func (p *ChatMessage) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Message)
+	rw.WriteString(w, p.Message)
 
 	return rw.Result()
 }
@@ -183,18 +180,18 @@ type TimeUpdate struct {
 
 func (p TimeUpdate) Id() byte { return 0x04 }
 func (p *TimeUpdate) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WorldAge = rw.MustReadInt64(r)
-	p.Time = rw.MustReadInt64(r)
+	var rw MustReadWriter
+	p.WorldAge = rw.ReadInt64(r)
+	p.Time = rw.ReadInt64(r)
 
 	return rw.Result()
 }
 func (p *TimeUpdate) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt64(w, p.WorldAge)
-	rw.MustWriteInt64(w, p.Time)
+	rw.WriteInt64(w, p.WorldAge)
+	rw.WriteInt64(w, p.Time)
 
 	return rw.Result()
 }
@@ -209,20 +206,20 @@ type EntityEquipment struct {
 
 func (p EntityEquipment) Id() byte { return 0x05 }
 func (p *EntityEquipment) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Slot = rw.MustReadInt16(r)
-	// p.Item = rw.MustReadSlot(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Slot = rw.ReadInt16(r)
+	// p.Item = rw.ReadSlot(r)
 
 	return rw.Result()
 }
 func (p *EntityEquipment) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt16(w, p.Slot)
-	// rw.MustWriteSlot(w, p.Item)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt16(w, p.Slot)
+	// rw.WriteSlot(w, p.Item)
 
 	return rw.Result()
 }
@@ -239,20 +236,20 @@ type SpawnPosition struct {
 
 func (p SpawnPosition) Id() byte { return 0x06 }
 func (p *SpawnPosition) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 func (p *SpawnPosition) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
 
 	return rw.Result()
 }
@@ -272,20 +269,20 @@ type EntityInteract struct {
 
 func (p EntityInteract) Id() byte { return 0x07 }
 func (p *EntityInteract) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.From = rw.MustReadInt32(r)
-	p.To = rw.MustReadInt32(r)
-	p.MouseButton = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.From = rw.ReadInt32(r)
+	p.To = rw.ReadInt32(r)
+	p.MouseButton = rw.ReadBool(r)
 
 	return rw.Result()
 }
 func (p *EntityInteract) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.From)
-	rw.MustWriteInt32(w, p.To)
-	rw.MustWriteBool(w, p.MouseButton)
+	rw.WriteInt32(w, p.From)
+	rw.WriteInt32(w, p.To)
+	rw.WriteBool(w, p.MouseButton)
 
 	return rw.Result()
 }
@@ -306,20 +303,20 @@ type HealthUpdate struct {
 
 func (p HealthUpdate) Id() byte { return 0x08 }
 func (p *HealthUpdate) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Health = rw.MustReadInt16(r)
-	p.Food = rw.MustReadInt16(r)
-	p.Saturation = rw.MustReadFloat32(r)
+	var rw MustReadWriter
+	p.Health = rw.ReadInt16(r)
+	p.Food = rw.ReadInt16(r)
+	p.Saturation = rw.ReadFloat32(r)
 
 	return rw.Result()
 }
 func (p *HealthUpdate) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, p.Health)
-	rw.MustWriteInt16(w, p.Food)
-	rw.MustWriteFloat32(w, p.Saturation)
+	rw.WriteInt16(w, p.Health)
+	rw.WriteInt16(w, p.Food)
+	rw.WriteFloat32(w, p.Saturation)
 
 	return rw.Result()
 }
@@ -339,24 +336,24 @@ type Respawn struct {
 
 func (p Respawn) Id() byte { return 0x09 }
 func (p *Respawn) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Dimension = rw.MustReadInt32(r)
-	p.Difficulty = rw.MustReadInt8(r)
-	p.GameMode = rw.MustReadInt8(r)
-	p.WorldHeight = rw.MustReadInt16(r)
-	p.LevelType = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.Dimension = rw.ReadInt32(r)
+	p.Difficulty = rw.ReadInt8(r)
+	p.GameMode = rw.ReadInt8(r)
+	p.WorldHeight = rw.ReadInt16(r)
+	p.LevelType = rw.ReadString(r)
 
 	return rw.Result()
 }
 func (p *Respawn) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Dimension)
-	rw.MustWriteInt8(w, p.Difficulty)
-	rw.MustWriteInt8(w, p.GameMode)
-	rw.MustWriteInt16(w, p.WorldHeight)
-	rw.MustWriteString(w, p.LevelType)
+	rw.WriteInt32(w, p.Dimension)
+	rw.WriteInt8(w, p.Difficulty)
+	rw.WriteInt8(w, p.GameMode)
+	rw.WriteInt16(w, p.WorldHeight)
+	rw.WriteString(w, p.LevelType)
 
 	return rw.Result()
 }
@@ -373,16 +370,16 @@ type Player struct {
 
 func (p Player) Id() byte { return 0x0A }
 func (p *Player) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.OnGround = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.OnGround = rw.ReadBool(r)
 
 	return rw.Result()
 }
 func (p *Player) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteBool(w, p.OnGround)
+	rw.WriteBool(w, p.OnGround)
 
 	return rw.Result()
 }
@@ -411,24 +408,24 @@ type PlayerPos struct {
 
 func (p PlayerPos) Id() byte { return 0x0B }
 func (p *PlayerPos) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadFloat64(r)
-	p.Y = rw.MustReadFloat64(r)
-	p.Stance = rw.MustReadFloat64(r)
-	p.Z = rw.MustReadFloat64(r)
-	p.OnGround = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.X = rw.ReadFloat64(r)
+	p.Y = rw.ReadFloat64(r)
+	p.Stance = rw.ReadFloat64(r)
+	p.Z = rw.ReadFloat64(r)
+	p.OnGround = rw.ReadBool(r)
 
 	return rw.Result()
 }
 func (p *PlayerPos) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteFloat64(w, p.X)
-	rw.MustWriteFloat64(w, p.Y)
-	rw.MustWriteFloat64(w, p.Stance)
-	rw.MustWriteFloat64(w, p.Z)
-	rw.MustWriteBool(w, p.OnGround)
+	rw.WriteFloat64(w, p.X)
+	rw.WriteFloat64(w, p.Y)
+	rw.WriteFloat64(w, p.Stance)
+	rw.WriteFloat64(w, p.Z)
+	rw.WriteBool(w, p.OnGround)
 
 	return rw.Result()
 }
@@ -456,20 +453,20 @@ type PlayerLook struct {
 
 func (p PlayerLook) Id() byte { return 0x0C }
 func (p *PlayerLook) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Yaw = rw.MustReadFloat32(r)
-	p.Pitch = rw.MustReadFloat32(r)
-	p.OnGround = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.Yaw = rw.ReadFloat32(r)
+	p.Pitch = rw.ReadFloat32(r)
+	p.OnGround = rw.ReadBool(r)
 
 	return rw.Result()
 }
 func (p *PlayerLook) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteFloat32(w, p.Yaw)
-	rw.MustWriteFloat32(w, p.Pitch)
-	rw.MustWriteBool(w, p.OnGround)
+	rw.WriteFloat32(w, p.Yaw)
+	rw.WriteFloat32(w, p.Pitch)
+	rw.WriteBool(w, p.OnGround)
 
 	return rw.Result()
 }
@@ -489,28 +486,28 @@ type PlayerPosLook struct {
 
 func (p PlayerPosLook) Id() byte { return 0x0D }
 func (p *PlayerPosLook) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadFloat64(r)
-	p.Y = rw.MustReadFloat64(r)
-	p.Stance = rw.MustReadFloat64(r)
-	p.Z = rw.MustReadFloat64(r)
-	p.Yaw = rw.MustReadFloat32(r)
-	p.Pitch = rw.MustReadFloat32(r)
-	p.OnGround = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.X = rw.ReadFloat64(r)
+	p.Y = rw.ReadFloat64(r)
+	p.Stance = rw.ReadFloat64(r)
+	p.Z = rw.ReadFloat64(r)
+	p.Yaw = rw.ReadFloat32(r)
+	p.Pitch = rw.ReadFloat32(r)
+	p.OnGround = rw.ReadBool(r)
 
 	return rw.Result()
 }
 func (p *PlayerPosLook) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteFloat64(w, p.X)
-	rw.MustWriteFloat64(w, p.Y)
-	rw.MustWriteFloat64(w, p.Stance)
-	rw.MustWriteFloat64(w, p.Z)
-	rw.MustWriteFloat32(w, p.Yaw)
-	rw.MustWriteFloat32(w, p.Pitch)
-	rw.MustWriteBool(w, p.OnGround)
+	rw.WriteFloat64(w, p.X)
+	rw.WriteFloat64(w, p.Y)
+	rw.WriteFloat64(w, p.Stance)
+	rw.WriteFloat64(w, p.Z)
+	rw.WriteFloat32(w, p.Yaw)
+	rw.WriteFloat32(w, p.Pitch)
+	rw.WriteBool(w, p.OnGround)
 
 	return rw.Result()
 }
@@ -539,24 +536,24 @@ type PlayerAction struct {
 
 func (p PlayerAction) Id() byte { return 0x0E }
 func (p *PlayerAction) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Action = rw.MustReadInt8(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Face = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Action = rw.ReadInt8(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt32(r)
+	p.Face = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 func (p *PlayerAction) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Action)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Face)
+	rw.WriteInt8(w, p.Action)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Face)
 
 	return rw.Result()
 }
@@ -585,30 +582,30 @@ type PlayerBlockPlace struct {
 
 func (p PlayerBlockPlace) Id() byte { return 0x0F }
 func (p *PlayerBlockPlace) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = byte(rw.MustReadInt8(r))
-	p.Z = rw.MustReadInt32(r)
-	p.Direction = rw.MustReadInt8(r)
-	p.HeldItem = rw.MustReadSlot(r)
-	p.ChX = rw.MustReadInt8(r)
-	p.ChY = rw.MustReadInt8(r)
-	p.ChZ = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = byte(rw.ReadInt8(r))
+	p.Z = rw.ReadInt32(r)
+	p.Direction = rw.ReadInt8(r)
+	p.HeldItem = rw.ReadSlot(r)
+	p.ChX = rw.ReadInt8(r)
+	p.ChY = rw.ReadInt8(r)
+	p.ChZ = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 func (p *PlayerBlockPlace) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt8(w, int8(p.Y))
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Direction)
-	rw.MustWriteSlot(w, p.HeldItem)
-	rw.MustWriteInt8(w, p.ChX)
-	rw.MustWriteInt8(w, p.ChY)
-	rw.MustWriteInt8(w, p.ChZ)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt8(w, int8(p.Y))
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Direction)
+	rw.WriteSlot(w, p.HeldItem)
+	rw.WriteInt8(w, p.ChX)
+	rw.WriteInt8(w, p.ChY)
+	rw.WriteInt8(w, p.ChZ)
 
 	return rw.Result()
 }
@@ -621,16 +618,16 @@ type ItemHeldChange struct {
 
 func (p ItemHeldChange) Id() byte { return 0x10 }
 func (p *ItemHeldChange) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.SlotId = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.SlotId = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 func (p *ItemHeldChange) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, p.SlotId)
+	rw.WriteInt16(w, p.SlotId)
 
 	return rw.Result()
 }
@@ -649,24 +646,24 @@ type BedUse struct {
 
 func (p BedUse) Id() byte { return 0x11 }
 func (p *BedUse) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	_ = rw.MustReadInt8(r) // Unknown use, only 0 observed
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	_ = rw.ReadInt8(r) // Unknown use, only 0 observed
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 func (p *BedUse) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, 0) // Unknown use, only 0 observed
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, 0) // Unknown use, only 0 observed
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt32(w, p.Z)
 
 	return rw.Result()
 }
@@ -680,18 +677,18 @@ type Animation struct {
 
 func (p Animation) Id() byte { return 0x12 }
 func (p *Animation) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Animation = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Animation = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 func (p *Animation) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Animation)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Animation)
 
 	return rw.Result()
 }
@@ -705,18 +702,18 @@ type EntityAction struct {
 
 func (p EntityAction) Id() byte { return 0x13 }
 func (p *EntityAction) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Action = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Action = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 func (p *EntityAction) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Action)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Action)
 
 	return rw.Result()
 }
@@ -739,32 +736,32 @@ type EntityNamedSpawn struct {
 
 func (p EntityNamedSpawn) Id() byte { return 0x14 }
 func (p *EntityNamedSpawn) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Name = rw.MustReadString(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.Pitch = rw.MustReadInt8(r)
-	p.Item = rw.MustReadInt16(r)
-	p.Metadata = rw.MustReadMetadata(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Name = rw.ReadString(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.Pitch = rw.ReadInt8(r)
+	p.Item = rw.ReadInt16(r)
+	p.Metadata = rw.ReadMetadata(r)
 
 	return rw.Result()
 }
 func (p *EntityNamedSpawn) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteInt8(w, p.Pitch)
-	rw.MustWriteInt16(w, p.Item)
-	rw.MustWriteMetadata(w, p.Metadata)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteString(w, p.Name)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt16(w, p.Item)
+	rw.WriteMetadata(w, p.Metadata)
 
 	return rw.Result()
 }
@@ -781,18 +778,18 @@ type ItemCollect struct {
 
 func (p ItemCollect) Id() byte { return 0x16 }
 func (p *ItemCollect) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WhatId = rw.MustReadInt32(r)
-	p.WhoId = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.WhatId = rw.ReadInt32(r)
+	p.WhoId = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 func (p *ItemCollect) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.WhatId)
-	rw.MustWriteInt32(w, p.WhoId)
+	rw.WriteInt32(w, p.WhatId)
+	rw.WriteInt32(w, p.WhoId)
 
 	return rw.Result()
 }
@@ -809,30 +806,30 @@ type SpawnObjectVehicle struct {
 
 func (p SpawnObjectVehicle) Id() byte { return 0x17 }
 func (p *SpawnObjectVehicle) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Type = rw.MustReadInt8(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Pitch = rw.MustReadInt8(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.ObjectData = rw.MustReadObjectData(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Type = rw.ReadInt8(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Pitch = rw.ReadInt8(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.ObjectData = rw.ReadObjectData(r)
 
 	return rw.Result()
 }
 func (p *SpawnObjectVehicle) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Type)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Pitch)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteObjectData(w, p.ObjectData)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Type)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteObjectData(w, p.ObjectData)
 
 	return rw.Result()
 }
@@ -850,39 +847,39 @@ type SpawnMob struct {
 
 func (p SpawnMob) Id() byte { return 0x18 }
 func (p *SpawnMob) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Type = rw.MustReadInt8(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Pitch = rw.MustReadInt8(r)
-	p.HeadPitch = rw.MustReadInt8(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.VelX = rw.MustReadInt16(r)
-	p.VelY = rw.MustReadInt16(r)
-	p.VelZ = rw.MustReadInt16(r)
-	p.Metadata = rw.MustReadMetadata(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Type = rw.ReadInt8(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Pitch = rw.ReadInt8(r)
+	p.HeadPitch = rw.ReadInt8(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.VelX = rw.ReadInt16(r)
+	p.VelY = rw.ReadInt16(r)
+	p.VelZ = rw.ReadInt16(r)
+	p.Metadata = rw.ReadMetadata(r)
 
 	return rw.Result()
 }
 
 func (p *SpawnMob) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Type)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Pitch)
-	rw.MustWriteInt8(w, p.HeadPitch)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteInt16(w, p.VelX)
-	rw.MustWriteInt16(w, p.VelY)
-	rw.MustWriteInt16(w, p.VelZ)
-	rw.MustWriteMetadata(w, p.Metadata)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Type)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt8(w, p.HeadPitch)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteInt16(w, p.VelX)
+	rw.WriteInt16(w, p.VelY)
+	rw.WriteInt16(w, p.VelZ)
+	rw.WriteMetadata(w, p.Metadata)
 
 	return rw.Result()
 }
@@ -901,27 +898,27 @@ type SpawnPainting struct {
 
 func (p SpawnPainting) Id() byte { return 0x19 }
 func (p *SpawnPainting) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Title = rw.MustReadString(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Direction = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Title = rw.ReadString(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Direction = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *SpawnPainting) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteString(w, p.Title)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt32(w, p.Direction)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteString(w, p.Title)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt32(w, p.Direction)
 
 	return rw.Result()
 }
@@ -936,25 +933,25 @@ type SpawnExperienceOrb struct {
 
 func (p SpawnExperienceOrb) Id() byte { return 0x1A }
 func (p *SpawnExperienceOrb) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Count = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Count = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *SpawnExperienceOrb) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt16(w, p.Count)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt16(w, p.Count)
 
 	return rw.Result()
 }
@@ -975,23 +972,23 @@ type EntityVelocity struct {
 
 func (p EntityVelocity) Id() byte { return 0x1C }
 func (p *EntityVelocity) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.VelX = rw.MustReadInt16(r)
-	p.VelY = rw.MustReadInt16(r)
-	p.VelZ = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.VelX = rw.ReadInt16(r)
+	p.VelY = rw.ReadInt16(r)
+	p.VelZ = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *EntityVelocity) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt16(w, p.VelX)
-	rw.MustWriteInt16(w, p.VelY)
-	rw.MustWriteInt16(w, p.VelZ)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt16(w, p.VelX)
+	rw.WriteInt16(w, p.VelY)
+	rw.WriteInt16(w, p.VelZ)
 
 	return rw.Result()
 }
@@ -1005,22 +1002,22 @@ type EntityDestroy struct {
 
 func (p EntityDestroy) Id() byte { return 0x1D }
 func (p *EntityDestroy) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Count = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Count = rw.ReadInt8(r)
 	for i := 0; i < int(p.Count); i++ {
-		p.Entities = append(p.Entities, rw.MustReadInt32(r))
+		p.Entities = append(p.Entities, rw.ReadInt32(r))
 	}
 
 	return rw.Result()
 }
 
 func (p *EntityDestroy) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, int8(len(p.Entities)))
+	rw.WriteInt8(w, int8(len(p.Entities)))
 	for index, _ := range p.Entities {
-		rw.MustWriteInt32(w, p.Entities[index])
+		rw.WriteInt32(w, p.Entities[index])
 	}
 
 	return rw.Result()
@@ -1039,17 +1036,17 @@ type Entity struct {
 
 func (p Entity) Id() byte { return 0x1E }
 func (p *Entity) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *Entity) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
+	rw.WriteInt32(w, p.Entity)
 
 	return rw.Result()
 }
@@ -1066,23 +1063,23 @@ type EntityRelMove struct {
 
 func (p EntityRelMove) Id() byte { return 0x1F }
 func (p *EntityRelMove) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt8(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.X = rw.ReadInt8(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityRelMove) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt8(w, p.Z)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt8(w, p.Z)
 
 	return rw.Result()
 }
@@ -1099,21 +1096,21 @@ type EntityLook struct {
 
 func (p EntityLook) Id() byte { return 0x20 }
 func (p *EntityLook) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.Pitch = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.Pitch = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityLook) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteInt8(w, p.Pitch)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteInt8(w, p.Pitch)
 
 	return rw.Result()
 }
@@ -1131,27 +1128,27 @@ type EntityLookRelMove struct {
 
 func (p EntityLookRelMove) Id() byte { return 0x21 }
 func (p *EntityLookRelMove) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt8(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt8(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.Pitch = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.X = rw.ReadInt8(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt8(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.Pitch = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityLookRelMove) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt8(w, p.Z)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteInt8(w, p.Pitch)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt8(w, p.Z)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteInt8(w, p.Pitch)
 
 	return rw.Result()
 }
@@ -1169,27 +1166,27 @@ type EntityTeleport struct {
 
 func (p EntityTeleport) Id() byte { return 0x22 }
 func (p *EntityTeleport) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Yaw = rw.MustReadInt8(r)
-	p.Pitch = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Yaw = rw.ReadInt8(r)
+	p.Pitch = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityTeleport) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Yaw)
-	rw.MustWriteInt8(w, p.Pitch)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Yaw)
+	rw.WriteInt8(w, p.Pitch)
 
 	return rw.Result()
 }
@@ -1203,19 +1200,19 @@ type EntityHeadLook struct {
 
 func (p EntityHeadLook) Id() byte { return 0x23 }
 func (p *EntityHeadLook) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.HeadYaw = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.HeadYaw = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityHeadLook) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.HeadYaw)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.HeadYaw)
 
 	return rw.Result()
 }
@@ -1229,19 +1226,19 @@ type EntityStatus struct {
 
 func (p EntityStatus) Id() byte { return 0x26 }
 func (p *EntityStatus) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Status = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Status = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityStatus) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Status)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Status)
 
 	return rw.Result()
 }
@@ -1258,19 +1255,19 @@ type EntityAttach struct {
 
 func (p EntityAttach) Id() byte { return 0x27 }
 func (p *EntityAttach) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.VehicleId = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.VehicleId = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *EntityAttach) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt32(w, p.VehicleId)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt32(w, p.VehicleId)
 
 	return rw.Result()
 }
@@ -1284,19 +1281,19 @@ type EntityMetadata struct {
 
 func (p EntityMetadata) Id() byte { return 0x28 }
 func (p *EntityMetadata) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Meta = rw.MustReadMetadata(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Meta = rw.ReadMetadata(r)
 
 	return rw.Result()
 }
 
 func (p *EntityMetadata) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteMetadata(w, p.Meta)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteMetadata(w, p.Meta)
 
 	return rw.Result()
 }
@@ -1312,23 +1309,23 @@ type EntityEffect struct {
 
 func (p EntityEffect) Id() byte { return 0x29 }
 func (p *EntityEffect) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Effect = rw.MustReadInt8(r)
-	p.Amplifier = rw.MustReadInt8(r)
-	p.Duration = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Effect = rw.ReadInt8(r)
+	p.Amplifier = rw.ReadInt8(r)
+	p.Duration = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *EntityEffect) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Effect)
-	rw.MustWriteInt8(w, p.Amplifier)
-	rw.MustWriteInt16(w, p.Duration)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Effect)
+	rw.WriteInt8(w, p.Amplifier)
+	rw.WriteInt16(w, p.Duration)
 
 	return rw.Result()
 }
@@ -1342,19 +1339,19 @@ type EntityEffectRemove struct {
 
 func (p EntityEffectRemove) Id() byte { return 0x2A }
 func (p *EntityEffectRemove) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Effect = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Effect = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EntityEffectRemove) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Effect)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Effect)
 
 	return rw.Result()
 }
@@ -1369,21 +1366,21 @@ type SetExperience struct {
 
 func (p SetExperience) Id() byte { return 0x2B }
 func (p *SetExperience) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Xp = rw.MustReadFloat32(r)
-	p.Level = rw.MustReadInt16(r)
-	p.TotalXp = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Xp = rw.ReadFloat32(r)
+	p.Level = rw.ReadInt16(r)
+	p.TotalXp = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *SetExperience) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteFloat32(w, p.Xp)
-	rw.MustWriteInt16(w, p.Level)
-	rw.MustWriteInt16(w, p.TotalXp)
+	rw.WriteFloat32(w, p.Xp)
+	rw.WriteInt16(w, p.Level)
+	rw.WriteInt16(w, p.TotalXp)
 
 	return rw.Result()
 }
@@ -1401,14 +1398,14 @@ type ChunkData struct {
 
 func (p ChunkData) Id() byte { return 0x33 }
 func (p *ChunkData) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.GroundUpContinuous = rw.MustReadBool(r)
-	p.Primary = uint16(rw.MustReadInt16(r))
-	p.Add = uint16(rw.MustReadInt16(r))
-	length := int(rw.MustReadInt32(r))
-	p.ChunkData = rw.MustReadByteArray(r, length)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.GroundUpContinuous = rw.ReadBool(r)
+	p.Primary = uint16(rw.ReadInt16(r))
+	p.Add = uint16(rw.ReadInt16(r))
+	length := int(rw.ReadInt32(r))
+	p.ChunkData = rw.ReadByteArray(r, length)
 
 	// // ChunkData is sent compressed with zlib deflate
 	// var buf bytes.Buffer
@@ -1420,16 +1417,16 @@ func (p *ChunkData) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (p *ChunkData) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteBool(w, p.GroundUpContinuous)
-	rw.MustWriteInt16(w, int16(p.Primary))
-	rw.MustWriteInt16(w, int16(p.Add))
-	rw.MustWriteInt32(w, int32(len(p.ChunkData)))
-	rw.MustWriteByteArray(w, p.ChunkData)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteBool(w, p.GroundUpContinuous)
+	rw.WriteInt16(w, int16(p.Primary))
+	rw.WriteInt16(w, int16(p.Add))
+	rw.WriteInt32(w, int32(len(p.ChunkData)))
+	rw.WriteByteArray(w, p.ChunkData)
 
 	// // ChunkData is sent compressed with zlib deflate
 	// var buf bytes.Buffer
@@ -1437,8 +1434,8 @@ func (p *ChunkData) WriteTo(w io.Writer) (n int64, err error) {
 	// rw.Must(io.Copy(&buf, zr))
 	// length := int32(buf.Len())
 
-	// rw.MustWriteInt(w, length)
-	// rw.MustWriteByteArray(r, buf.Bytes())
+	// rw.WriteInt(w, length)
+	// rw.WriteByteArray(r, buf.Bytes())
 
 	return rw.Result()
 }
@@ -1454,29 +1451,29 @@ type BlockChangeMulti struct {
 
 func (p BlockChangeMulti) Id() byte { return 0x34 }
 func (p *BlockChangeMulti) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Count = rw.MustReadInt16(r)
-	p.Length = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Count = rw.ReadInt16(r)
+	p.Length = rw.ReadInt32(r)
 	p.Blocks = make([]int32, p.Count)
 	for i := 0; i < int(p.Count); i++ {
-		p.Blocks[i] = rw.MustReadInt32(r)
+		p.Blocks[i] = rw.ReadInt32(r)
 	}
 
 	return rw.Result()
 }
 
 func (p *BlockChangeMulti) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt16(w, p.Count)
-	rw.MustWriteInt32(w, p.Length)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt16(w, p.Count)
+	rw.WriteInt32(w, p.Length)
 	for i := 0; i < len(p.Blocks); i++ {
-		rw.MustWriteInt32(w, p.Blocks[i])
+		rw.WriteInt32(w, p.Blocks[i])
 	}
 
 	return rw.Result()
@@ -1494,25 +1491,25 @@ type BlockChange struct {
 
 func (p BlockChange) Id() byte { return 0x35 }
 func (p *BlockChange) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt32(r)
-	p.BlockType = rw.MustReadInt16(r)
-	p.BlockMeta = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt32(r)
+	p.BlockType = rw.ReadInt16(r)
+	p.BlockMeta = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *BlockChange) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt16(w, p.BlockType)
-	rw.MustWriteInt8(w, p.BlockMeta)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt16(w, p.BlockType)
+	rw.WriteInt8(w, p.BlockMeta)
 
 	return rw.Result()
 }
@@ -1535,27 +1532,27 @@ type BlockAction struct {
 
 func (p BlockAction) Id() byte { return 0x36 }
 func (p *BlockAction) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt16(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Byte1 = rw.MustReadInt8(r)
-	p.Byte2 = rw.MustReadInt8(r)
-	p.BlockId = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt16(r)
+	p.Z = rw.ReadInt32(r)
+	p.Byte1 = rw.ReadInt8(r)
+	p.Byte2 = rw.ReadInt8(r)
+	p.BlockId = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *BlockAction) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt16(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Byte1)
-	rw.MustWriteInt8(w, p.Byte2)
-	rw.MustWriteInt16(w, p.BlockId)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt16(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Byte1)
+	rw.WriteInt8(w, p.Byte2)
+	rw.WriteInt16(w, p.BlockId)
 
 	return rw.Result()
 }
@@ -1570,25 +1567,25 @@ type BlockBreakAnimation struct {
 
 func (p BlockBreakAnimation) Id() byte { return 0x37 }
 func (p *BlockBreakAnimation) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Damage = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Damage = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *BlockBreakAnimation) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Damage)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Damage)
 
 	return rw.Result()
 }
@@ -1611,35 +1608,35 @@ type ChunkMeta struct {
 
 func (p MapChunkBulk) Id() byte { return 0x38 }
 func (p *MapChunkBulk) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Count = rw.MustReadInt16(r)
-	p.Length = rw.MustReadInt32(r)
-	p.SkylightSent = rw.MustReadBool(r)
-	p.ChunkData = rw.MustReadByteArray(r, int(p.Length))
+	var rw MustReadWriter
+	p.Count = rw.ReadInt16(r)
+	p.Length = rw.ReadInt32(r)
+	p.SkylightSent = rw.ReadBool(r)
+	p.ChunkData = rw.ReadByteArray(r, int(p.Length))
 	p.ChunkMeta = make([]ChunkMeta, p.Length)
 	for i := 0; i < int(p.Count); i++ {
-		p.ChunkMeta[i].X = rw.MustReadInt32(r)
-		p.ChunkMeta[i].Z = rw.MustReadInt32(r)
-		p.ChunkMeta[i].Primary = uint16(rw.MustReadInt16(r))
-		p.ChunkMeta[i].Add = uint16(rw.MustReadInt16(r))
+		p.ChunkMeta[i].X = rw.ReadInt32(r)
+		p.ChunkMeta[i].Z = rw.ReadInt32(r)
+		p.ChunkMeta[i].Primary = uint16(rw.ReadInt16(r))
+		p.ChunkMeta[i].Add = uint16(rw.ReadInt16(r))
 	}
 
 	return rw.Result()
 }
 
 func (p *MapChunkBulk) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, p.Count)
-	rw.MustWriteInt32(w, p.Length)
-	rw.MustWriteBool(w, p.SkylightSent)
-	rw.MustWriteByteArray(w, p.ChunkData)
+	rw.WriteInt16(w, p.Count)
+	rw.WriteInt32(w, p.Length)
+	rw.WriteBool(w, p.SkylightSent)
+	rw.WriteByteArray(w, p.ChunkData)
 	for i := 0; i < int(p.Count); i++ {
-		rw.MustWriteInt32(w, p.ChunkMeta[i].X)
-		rw.MustWriteInt32(w, p.ChunkMeta[i].Z)
-		rw.MustWriteInt16(w, int16(p.ChunkMeta[i].Primary))
-		rw.MustWriteInt16(w, int16(p.ChunkMeta[i].Add))
+		rw.WriteInt32(w, p.ChunkMeta[i].X)
+		rw.WriteInt32(w, p.ChunkMeta[i].Z)
+		rw.WriteInt16(w, int16(p.ChunkMeta[i].Primary))
+		rw.WriteInt16(w, int16(p.ChunkMeta[i].Add))
 	}
 
 	return rw.Result()
@@ -1657,44 +1654,44 @@ type Explosion struct {
 
 func (p Explosion) Id() byte { return 0x3C }
 func (p *Explosion) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadFloat64(r)
-	p.Y = rw.MustReadFloat64(r)
-	p.Z = rw.MustReadFloat64(r)
-	p.Radius = rw.MustReadFloat32(r)
-	p.Count = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.X = rw.ReadFloat64(r)
+	p.Y = rw.ReadFloat64(r)
+	p.Z = rw.ReadFloat64(r)
+	p.Radius = rw.ReadFloat32(r)
+	p.Count = rw.ReadInt32(r)
 	p.Blocks = make([][3]int8, p.Count)
 	for i := 0; i < int(p.Count); i++ {
 		p.Blocks[i] = [3]int8{
-			rw.MustReadInt8(r),
-			rw.MustReadInt8(r),
-			rw.MustReadInt8(r),
+			rw.ReadInt8(r),
+			rw.ReadInt8(r),
+			rw.ReadInt8(r),
 		}
 	}
-	p.PlayerX = rw.MustReadFloat32(r)
-	p.PlayerY = rw.MustReadFloat32(r)
-	p.PlayerZ = rw.MustReadFloat32(r)
+	p.PlayerX = rw.ReadFloat32(r)
+	p.PlayerY = rw.ReadFloat32(r)
+	p.PlayerZ = rw.ReadFloat32(r)
 
 	return rw.Result()
 }
 
 func (p *Explosion) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteFloat64(w, p.X)
-	rw.MustWriteFloat64(w, p.Y)
-	rw.MustWriteFloat64(w, p.Z)
-	rw.MustWriteFloat32(w, p.Radius)
-	rw.MustWriteInt32(w, p.Count)
+	rw.WriteFloat64(w, p.X)
+	rw.WriteFloat64(w, p.Y)
+	rw.WriteFloat64(w, p.Z)
+	rw.WriteFloat32(w, p.Radius)
+	rw.WriteInt32(w, p.Count)
 	for i := 0; i < len(p.Blocks); i++ {
-		rw.MustWriteInt8(w, p.Blocks[i][0])
-		rw.MustWriteInt8(w, p.Blocks[i][1])
-		rw.MustWriteInt8(w, p.Blocks[i][2])
+		rw.WriteInt8(w, p.Blocks[i][0])
+		rw.WriteInt8(w, p.Blocks[i][1])
+		rw.WriteInt8(w, p.Blocks[i][2])
 	}
-	rw.MustWriteFloat32(w, p.PlayerX)
-	rw.MustWriteFloat32(w, p.PlayerY)
-	rw.MustWriteFloat32(w, p.PlayerZ)
+	rw.WriteFloat32(w, p.PlayerX)
+	rw.WriteFloat32(w, p.PlayerY)
+	rw.WriteFloat32(w, p.PlayerZ)
 
 	return rw.Result()
 }
@@ -1715,27 +1712,27 @@ type SoundEffect struct {
 
 func (p SoundEffect) Id() byte { return 0x3D }
 func (p *SoundEffect) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.EffectId = rw.MustReadInt32(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt8(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Data = rw.MustReadInt32(r)
-	p.DisableRelVolume = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.EffectId = rw.ReadInt32(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt8(r)
+	p.Z = rw.ReadInt32(r)
+	p.Data = rw.ReadInt32(r)
+	p.DisableRelVolume = rw.ReadBool(r)
 
 	return rw.Result()
 }
 
 func (p *SoundEffect) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.EffectId)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt8(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt32(w, p.Data)
-	rw.MustWriteBool(w, p.DisableRelVolume)
+	rw.WriteInt32(w, p.EffectId)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt8(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt32(w, p.Data)
+	rw.WriteBool(w, p.DisableRelVolume)
 
 	return rw.Result()
 }
@@ -1751,27 +1748,27 @@ type SoundEffectNamed struct {
 
 func (p SoundEffectNamed) Id() byte { return 0x3E }
 func (p *SoundEffectNamed) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Volume = rw.MustReadFloat32(r)
-	p.Pitch = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
+	p.Volume = rw.ReadFloat32(r)
+	p.Pitch = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *SoundEffectNamed) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteFloat32(w, p.Volume)
-	rw.MustWriteInt8(w, p.Pitch)
+	rw.WriteString(w, p.Name)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteFloat32(w, p.Volume)
+	rw.WriteInt8(w, p.Pitch)
 
 	return rw.Result()
 }
@@ -1788,33 +1785,33 @@ type Particle struct {
 
 func (p Particle) Id() byte { return 0x3F }
 func (p *Particle) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	p.X = rw.MustReadFloat32(r)
-	p.Y = rw.MustReadFloat32(r)
-	p.Z = rw.MustReadFloat32(r)
-	p.OffsetX = rw.MustReadFloat32(r)
-	p.OffsetY = rw.MustReadFloat32(r)
-	p.OffsetZ = rw.MustReadFloat32(r)
-	p.Speed = rw.MustReadFloat32(r)
-	p.Number = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	p.X = rw.ReadFloat32(r)
+	p.Y = rw.ReadFloat32(r)
+	p.Z = rw.ReadFloat32(r)
+	p.OffsetX = rw.ReadFloat32(r)
+	p.OffsetY = rw.ReadFloat32(r)
+	p.OffsetZ = rw.ReadFloat32(r)
+	p.Speed = rw.ReadFloat32(r)
+	p.Number = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *Particle) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteFloat32(w, p.X)
-	rw.MustWriteFloat32(w, p.Y)
-	rw.MustWriteFloat32(w, p.Z)
-	rw.MustWriteFloat32(w, p.OffsetX)
-	rw.MustWriteFloat32(w, p.OffsetY)
-	rw.MustWriteFloat32(w, p.OffsetZ)
-	rw.MustWriteFloat32(w, p.Speed)
-	rw.MustWriteInt32(w, p.Number)
+	rw.WriteString(w, p.Name)
+	rw.WriteFloat32(w, p.X)
+	rw.WriteFloat32(w, p.Y)
+	rw.WriteFloat32(w, p.Z)
+	rw.WriteFloat32(w, p.OffsetX)
+	rw.WriteFloat32(w, p.OffsetY)
+	rw.WriteFloat32(w, p.OffsetZ)
+	rw.WriteFloat32(w, p.Speed)
+	rw.WriteInt32(w, p.Number)
 
 	return rw.Result()
 }
@@ -1828,19 +1825,19 @@ type GameStateChange struct {
 
 func (p GameStateChange) Id() byte { return 0x46 }
 func (p *GameStateChange) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Reason = rw.MustReadInt8(r)
-	p.GameMode = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Reason = rw.ReadInt8(r)
+	p.GameMode = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *GameStateChange) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Reason)
-	rw.MustWriteInt8(w, p.GameMode)
+	rw.WriteInt8(w, p.Reason)
+	rw.WriteInt8(w, p.GameMode)
 
 	return rw.Result()
 }
@@ -1855,25 +1852,25 @@ type EntityGlobalSpawn struct {
 
 func (p EntityGlobalSpawn) Id() byte { return 0x47 }
 func (p *EntityGlobalSpawn) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Entity = rw.MustReadInt32(r)
-	p.Type = rw.MustReadInt8(r)
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt32(r)
-	p.Z = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
+	p.Type = rw.ReadInt8(r)
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt32(r)
+	p.Z = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *EntityGlobalSpawn) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.Entity)
-	rw.MustWriteInt8(w, p.Type)
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt32(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
+	rw.WriteInt32(w, p.Entity)
+	rw.WriteInt8(w, p.Type)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt32(w, p.Y)
+	rw.WriteInt32(w, p.Z)
 
 	return rw.Result()
 }
@@ -1890,25 +1887,25 @@ type WindowOpen struct {
 
 func (p WindowOpen) Id() byte { return 0x64 }
 func (p *WindowOpen) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.InventoryType = rw.MustReadInt8(r)
-	p.WindowTitle = rw.MustReadString(r)
-	p.Slots = rw.MustReadInt8(r)
-	p.UseProvidedTitle = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.InventoryType = rw.ReadInt8(r)
+	p.WindowTitle = rw.ReadString(r)
+	p.Slots = rw.ReadInt8(r)
+	p.UseProvidedTitle = rw.ReadBool(r)
 
 	return rw.Result()
 }
 
 func (p *WindowOpen) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt8(w, p.InventoryType)
-	rw.MustWriteString(w, p.WindowTitle)
-	rw.MustWriteInt8(w, p.Slots)
-	rw.MustWriteBool(w, p.UseProvidedTitle)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt8(w, p.InventoryType)
+	rw.WriteString(w, p.WindowTitle)
+	rw.WriteInt8(w, p.Slots)
+	rw.WriteBool(w, p.UseProvidedTitle)
 
 	return rw.Result()
 }
@@ -1921,17 +1918,17 @@ type WindowClose struct {
 
 func (p WindowClose) Id() byte { return 0x65 }
 func (p *WindowClose) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *WindowClose) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
+	rw.WriteInt8(w, p.WindowId)
 
 	return rw.Result()
 }
@@ -1949,27 +1946,27 @@ type WindowClick struct {
 
 func (p WindowClick) Id() byte { return 0x66 }
 func (p *WindowClick) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Slot = rw.MustReadInt16(r)
-	p.Button = rw.MustReadInt8(r)
-	p.Action = rw.MustReadInt16(r)
-	p.Mode = rw.MustReadInt8(r)
-	p.Item = rw.MustReadSlot(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Slot = rw.ReadInt16(r)
+	p.Button = rw.ReadInt8(r)
+	p.Action = rw.ReadInt16(r)
+	p.Mode = rw.ReadInt8(r)
+	p.Item = rw.ReadSlot(r)
 
 	return rw.Result()
 }
 
 func (p *WindowClick) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt16(w, p.Slot)
-	rw.MustWriteInt8(w, p.Button)
-	rw.MustWriteInt16(w, p.Action)
-	rw.MustWriteInt8(w, p.Mode)
-	rw.MustWriteSlot(w, p.Item)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt16(w, p.Slot)
+	rw.WriteInt8(w, p.Button)
+	rw.WriteInt16(w, p.Action)
+	rw.WriteInt8(w, p.Mode)
+	rw.WriteSlot(w, p.Item)
 
 	return rw.Result()
 }
@@ -1984,21 +1981,21 @@ type WindowSlotSet struct {
 
 func (p WindowSlotSet) Id() byte { return 0x67 }
 func (p *WindowSlotSet) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Slot = rw.MustReadInt16(r)
-	p.Data = rw.MustReadSlot(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Slot = rw.ReadInt16(r)
+	p.Data = rw.ReadSlot(r)
 
 	return rw.Result()
 }
 
 func (p *WindowSlotSet) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt16(w, p.Slot)
-	rw.MustWriteSlot(w, p.Data)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt16(w, p.Slot)
+	rw.WriteSlot(w, p.Data)
 
 	return rw.Result()
 }
@@ -2013,25 +2010,25 @@ type WindowSetItems struct {
 
 func (p WindowSetItems) Id() byte { return 0x68 }
 func (p *WindowSetItems) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Count = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Count = rw.ReadInt16(r)
 	p.SlotData = make([]*mct.Slot, p.Count)
 	for i := 0; i < int(p.Count); i++ {
-		p.SlotData[i] = rw.MustReadSlot(r)
+		p.SlotData[i] = rw.ReadSlot(r)
 	}
 
 	return rw.Result()
 }
 
 func (p *WindowSetItems) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt16(w, p.Count)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt16(w, p.Count)
 	for i := 0; i < int(p.Count); i++ {
-		rw.MustWriteSlot(w, p.SlotData[i])
+		rw.WriteSlot(w, p.SlotData[i])
 	}
 
 	return rw.Result()
@@ -2047,21 +2044,21 @@ type WindowUpdateProperty struct {
 
 func (p WindowUpdateProperty) Id() byte { return 0x69 }
 func (p *WindowUpdateProperty) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Property = rw.MustReadInt16(r)
-	p.Value = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Property = rw.ReadInt16(r)
+	p.Value = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *WindowUpdateProperty) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt16(w, p.Property)
-	rw.MustWriteInt16(w, p.Value)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt16(w, p.Property)
+	rw.WriteInt16(w, p.Value)
 
 	return rw.Result()
 }
@@ -2076,21 +2073,21 @@ type ConfirmTransaction struct {
 
 func (p ConfirmTransaction) Id() byte { return 0x6A }
 func (p *ConfirmTransaction) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Action = rw.MustReadInt16(r)
-	p.Accepted = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Action = rw.ReadInt16(r)
+	p.Accepted = rw.ReadBool(r)
 
 	return rw.Result()
 }
 
 func (p *ConfirmTransaction) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt16(w, p.Action)
-	rw.MustWriteBool(w, p.Accepted)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt16(w, p.Action)
+	rw.WriteBool(w, p.Accepted)
 
 	return rw.Result()
 }
@@ -2104,19 +2101,19 @@ type CreativeInventoryAction struct {
 
 func (p CreativeInventoryAction) Id() byte { return 0x6B }
 func (p *CreativeInventoryAction) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Slot = rw.MustReadInt16(r)
-	p.Item = rw.MustReadSlot(r)
+	var rw MustReadWriter
+	p.Slot = rw.ReadInt16(r)
+	p.Item = rw.ReadSlot(r)
 
 	return rw.Result()
 }
 
 func (p *CreativeInventoryAction) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, p.Slot)
-	rw.MustWriteSlot(w, p.Item)
+	rw.WriteInt16(w, p.Slot)
+	rw.WriteSlot(w, p.Item)
 
 	return rw.Result()
 }
@@ -2136,19 +2133,19 @@ type EnchantItem struct {
 
 func (p EnchantItem) Id() byte { return 0x6C }
 func (p *EnchantItem) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.WindowId = rw.MustReadInt8(r)
-	p.Position = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.WindowId = rw.ReadInt8(r)
+	p.Position = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *EnchantItem) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.WindowId)
-	rw.MustWriteInt8(w, p.Position)
+	rw.WriteInt8(w, p.WindowId)
+	rw.WriteInt8(w, p.Position)
 
 	return rw.Result()
 }
@@ -2170,29 +2167,29 @@ type SignUpdate struct {
 
 func (p SignUpdate) Id() byte { return 0x82 }
 func (p *SignUpdate) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt16(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Lines[0] = rw.MustReadString(r)
-	p.Lines[1] = rw.MustReadString(r)
-	p.Lines[2] = rw.MustReadString(r)
-	p.Lines[3] = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt16(r)
+	p.Z = rw.ReadInt32(r)
+	p.Lines[0] = rw.ReadString(r)
+	p.Lines[1] = rw.ReadString(r)
+	p.Lines[2] = rw.ReadString(r)
+	p.Lines[3] = rw.ReadString(r)
 
 	return rw.Result()
 }
 
 func (p *SignUpdate) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt16(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteString(w, p.Lines[0])
-	rw.MustWriteString(w, p.Lines[1])
-	rw.MustWriteString(w, p.Lines[2])
-	rw.MustWriteString(w, p.Lines[3])
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt16(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteString(w, p.Lines[0])
+	rw.WriteString(w, p.Lines[1])
+	rw.WriteString(w, p.Lines[2])
+	rw.WriteString(w, p.Lines[3])
 
 	return rw.Result()
 }
@@ -2218,23 +2215,23 @@ type ItemData struct {
 
 func (p ItemData) Id() byte { return 0x83 }
 func (p *ItemData) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Type = rw.MustReadInt16(r)
-	p.ItemId = rw.MustReadInt16(r)
-	p.Length = rw.MustReadInt16(r)
-	p.Text = rw.MustReadByteArray(r, int(p.Length))
+	var rw MustReadWriter
+	p.Type = rw.ReadInt16(r)
+	p.ItemId = rw.ReadInt16(r)
+	p.Length = rw.ReadInt16(r)
+	p.Text = rw.ReadByteArray(r, int(p.Length))
 
 	return rw.Result()
 }
 
 func (p *ItemData) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, p.Type)
-	rw.MustWriteInt16(w, p.ItemId)
-	rw.MustWriteInt16(w, p.Length)
-	rw.MustWriteByteArray(w, p.Text)
+	rw.WriteInt16(w, p.Type)
+	rw.WriteInt16(w, p.ItemId)
+	rw.WriteInt16(w, p.Length)
+	rw.WriteByteArray(w, p.Text)
 
 	return rw.Result()
 }
@@ -2252,27 +2249,27 @@ type TileEntityUpdate struct {
 
 func (p TileEntityUpdate) Id() byte { return 0x84 }
 func (p *TileEntityUpdate) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.X = rw.MustReadInt32(r)
-	p.Y = rw.MustReadInt16(r)
-	p.Z = rw.MustReadInt32(r)
-	p.Action = rw.MustReadInt8(r)
-	length := rw.MustReadInt16(r)
-	p.Data = rw.MustReadByteArray(r, int(length))
+	var rw MustReadWriter
+	p.X = rw.ReadInt32(r)
+	p.Y = rw.ReadInt16(r)
+	p.Z = rw.ReadInt32(r)
+	p.Action = rw.ReadInt8(r)
+	length := rw.ReadInt16(r)
+	p.Data = rw.ReadByteArray(r, int(length))
 
 	return rw.Result()
 }
 
 func (p *TileEntityUpdate) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.X)
-	rw.MustWriteInt16(w, p.Y)
-	rw.MustWriteInt32(w, p.Z)
-	rw.MustWriteInt8(w, p.Action)
-	rw.MustWriteInt16(w, int16(len(p.Data)))
-	rw.MustWriteByteArray(w, p.Data)
+	rw.WriteInt32(w, p.X)
+	rw.WriteInt16(w, p.Y)
+	rw.WriteInt32(w, p.Z)
+	rw.WriteInt8(w, p.Action)
+	rw.WriteInt16(w, int16(len(p.Data)))
+	rw.WriteByteArray(w, p.Data)
 
 	return rw.Result()
 }
@@ -2286,19 +2283,19 @@ type StatIncrement struct {
 
 func (p StatIncrement) Id() byte { return 0xC8 }
 func (p *StatIncrement) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.StatId = rw.MustReadInt32(r)
-	p.Amount = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.StatId = rw.ReadInt32(r)
+	p.Amount = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *StatIncrement) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt32(w, p.StatId)
-	rw.MustWriteInt8(w, p.Amount)
+	rw.WriteInt32(w, p.StatId)
+	rw.WriteInt8(w, p.Amount)
 
 	return rw.Result()
 }
@@ -2317,21 +2314,21 @@ type PlayerTabListPing struct {
 
 func (p PlayerTabListPing) Id() byte { return 0xC9 }
 func (p *PlayerTabListPing) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	p.Online = rw.MustReadBool(r)
-	p.Ping = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	p.Online = rw.ReadBool(r)
+	p.Ping = rw.ReadInt16(r)
 
 	return rw.Result()
 }
 
 func (p *PlayerTabListPing) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteBool(w, p.Online)
-	rw.MustWriteInt16(w, p.Ping)
+	rw.WriteString(w, p.Name)
+	rw.WriteBool(w, p.Online)
+	rw.WriteInt16(w, p.Ping)
 
 	return rw.Result()
 }
@@ -2359,10 +2356,10 @@ type PlayerAbilities struct {
 
 func (p PlayerAbilities) Id() byte { return 0xCA }
 func (p *PlayerAbilities) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	flags := rw.MustReadInt8(r)
-	p.FlyingSpeed = rw.MustReadInt8(r)
-	p.WalkingSpeed = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	flags := rw.ReadInt8(r)
+	p.FlyingSpeed = rw.ReadInt8(r)
+	p.WalkingSpeed = rw.ReadInt8(r)
 
 	p.GodMode = flags&8 == 8
 	p.CanFly = flags&4 == 4
@@ -2373,7 +2370,7 @@ func (p *PlayerAbilities) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (p *PlayerAbilities) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 
@@ -2391,9 +2388,9 @@ func (p *PlayerAbilities) WriteTo(w io.Writer) (n int64, err error) {
 		flags |= 1
 	}
 
-	rw.MustWriteInt8(w, flags)
-	rw.MustWriteInt8(w, p.FlyingSpeed)
-	rw.MustWriteInt8(w, p.WalkingSpeed)
+	rw.WriteInt8(w, flags)
+	rw.WriteInt8(w, p.FlyingSpeed)
+	rw.WriteInt8(w, p.WalkingSpeed)
 
 	return rw.Result()
 }
@@ -2406,17 +2403,17 @@ type TabComplete struct {
 
 func (p TabComplete) Id() byte { return 0xCB }
 func (p *TabComplete) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Text = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.Text = rw.ReadString(r)
 
 	return rw.Result()
 }
 
 func (p *TabComplete) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Text)
+	rw.WriteString(w, p.Text)
 
 	return rw.Result()
 }
@@ -2433,25 +2430,25 @@ type ClientSettings struct {
 
 func (p ClientSettings) Id() byte { return 0xCC }
 func (p *ClientSettings) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Locale = rw.MustReadString(r)
-	p.ViewDistance = rw.MustReadInt8(r)
-	p.ChatFlags = rw.MustReadInt8(r)
-	p.Difficulty = rw.MustReadInt8(r)
-	p.ShowCape = rw.MustReadBool(r)
+	var rw MustReadWriter
+	p.Locale = rw.ReadString(r)
+	p.ViewDistance = rw.ReadInt8(r)
+	p.ChatFlags = rw.ReadInt8(r)
+	p.Difficulty = rw.ReadInt8(r)
+	p.ShowCape = rw.ReadBool(r)
 
 	return rw.Result()
 }
 
 func (p *ClientSettings) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Locale)
-	rw.MustWriteInt8(w, p.ViewDistance)
-	rw.MustWriteInt8(w, p.ChatFlags)
-	rw.MustWriteInt8(w, p.Difficulty)
-	rw.MustWriteBool(w, p.ShowCape)
+	rw.WriteString(w, p.Locale)
+	rw.WriteInt8(w, p.ViewDistance)
+	rw.WriteInt8(w, p.ChatFlags)
+	rw.WriteInt8(w, p.Difficulty)
+	rw.WriteBool(w, p.ShowCape)
 
 	return rw.Result()
 }
@@ -2464,17 +2461,17 @@ type ClientStatuses struct {
 
 func (p ClientStatuses) Id() byte { return 0xCD }
 func (p *ClientStatuses) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Payload = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Payload = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *ClientStatuses) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Payload)
+	rw.WriteInt8(w, p.Payload)
 
 	return rw.Result()
 }
@@ -2489,21 +2486,21 @@ type ScoreObjective struct {
 
 func (p ScoreObjective) Id() byte { return 0xCE }
 func (p *ScoreObjective) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	p.Value = rw.MustReadString(r)
-	p.Action = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	p.Value = rw.ReadString(r)
+	p.Action = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *ScoreObjective) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteString(w, p.Value)
-	rw.MustWriteInt8(w, p.Action)
+	rw.WriteString(w, p.Name)
+	rw.WriteString(w, p.Value)
+	rw.WriteInt8(w, p.Action)
 
 	return rw.Result()
 }
@@ -2519,23 +2516,23 @@ type ScoreUpdate struct {
 
 func (p ScoreUpdate) Id() byte { return 0xCF }
 func (p *ScoreUpdate) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.EntityName = rw.MustReadString(r)
-	p.Action = rw.MustReadInt8(r)
-	p.Objetive = rw.MustReadString(r)
-	p.Value = rw.MustReadInt32(r)
+	var rw MustReadWriter
+	p.EntityName = rw.ReadString(r)
+	p.Action = rw.ReadInt8(r)
+	p.Objetive = rw.ReadString(r)
+	p.Value = rw.ReadInt32(r)
 
 	return rw.Result()
 }
 
 func (p *ScoreUpdate) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.EntityName)
-	rw.MustWriteInt8(w, p.Action)
-	rw.MustWriteString(w, p.Objetive)
-	rw.MustWriteInt32(w, p.Value)
+	rw.WriteString(w, p.EntityName)
+	rw.WriteInt8(w, p.Action)
+	rw.WriteString(w, p.Objetive)
+	rw.WriteInt32(w, p.Value)
 
 	return rw.Result()
 }
@@ -2549,19 +2546,19 @@ type ScoreDisplay struct {
 
 func (p ScoreDisplay) Id() byte { return 0xD0 }
 func (p *ScoreDisplay) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Position = rw.MustReadInt8(r)
-	p.DisplayName = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.Position = rw.ReadInt8(r)
+	p.DisplayName = rw.ReadString(r)
 
 	return rw.Result()
 }
 
 func (p *ScoreDisplay) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Position)
-	rw.MustWriteString(w, p.DisplayName)
+	rw.WriteInt8(w, p.Position)
+	rw.WriteString(w, p.DisplayName)
 
 	return rw.Result()
 }
@@ -2579,35 +2576,35 @@ type ScoreTeams struct {
 
 func (p ScoreTeams) Id() byte { return 0xD1 }
 func (p *ScoreTeams) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	p.Mode = rw.MustReadInt8(r)
-	p.DisplayName = rw.MustReadString(r)
-	p.Prefix = rw.MustReadString(r)
-	p.Suffix = rw.MustReadString(r)
-	p.FriendlyFire = rw.MustReadInt8(r)
-	p.Count = rw.MustReadInt16(r)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	p.Mode = rw.ReadInt8(r)
+	p.DisplayName = rw.ReadString(r)
+	p.Prefix = rw.ReadString(r)
+	p.Suffix = rw.ReadString(r)
+	p.FriendlyFire = rw.ReadInt8(r)
+	p.Count = rw.ReadInt16(r)
 	p.Players = make([]string, p.Count)
 	for i := 0; i < len(p.Players); i++ {
-		p.Players[i] = rw.MustReadString(r)
+		p.Players[i] = rw.ReadString(r)
 	}
 
 	return rw.Result()
 }
 
 func (p *ScoreTeams) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteInt8(w, p.Mode)
-	rw.MustWriteString(w, p.DisplayName)
-	rw.MustWriteString(w, p.Prefix)
-	rw.MustWriteString(w, p.Suffix)
-	rw.MustWriteInt8(w, p.FriendlyFire)
-	rw.MustWriteInt16(w, p.Count)
+	rw.WriteString(w, p.Name)
+	rw.WriteInt8(w, p.Mode)
+	rw.WriteString(w, p.DisplayName)
+	rw.WriteString(w, p.Prefix)
+	rw.WriteString(w, p.Suffix)
+	rw.WriteInt8(w, p.FriendlyFire)
+	rw.WriteInt16(w, p.Count)
 	for i := 0; i < len(p.Players); i++ {
-		rw.MustWriteString(w, p.Players[i])
+		rw.WriteString(w, p.Players[i])
 	}
 
 	return rw.Result()
@@ -2623,21 +2620,21 @@ type PluginMessage struct {
 
 func (p PluginMessage) Id() byte { return 0xFA }
 func (p *PluginMessage) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Name = rw.MustReadString(r)
-	length := int(rw.MustReadInt16(r))
-	p.Payload = rw.MustReadByteArray(r, length)
+	var rw MustReadWriter
+	p.Name = rw.ReadString(r)
+	length := int(rw.ReadInt16(r))
+	p.Payload = rw.ReadByteArray(r, length)
 
 	return rw.Result()
 }
 
 func (p *PluginMessage) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Name)
-	rw.MustWriteInt16(w, int16(len(p.Payload)))
-	rw.MustWriteByteArray(w, p.Payload)
+	rw.WriteString(w, p.Name)
+	rw.WriteInt16(w, int16(len(p.Payload)))
+	rw.WriteByteArray(w, p.Payload)
 
 	return rw.Result()
 }
@@ -2650,23 +2647,23 @@ type EncryptionKeyResponse struct {
 
 func (p EncryptionKeyResponse) Id() byte { return 0xFC }
 func (p *EncryptionKeyResponse) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	SecretLen := rw.MustReadInt16(r)
-	p.Secret = rw.MustReadByteArray(r, int(SecretLen))
-	TokenLen := rw.MustReadInt16(r)
-	p.Token = rw.MustReadByteArray(r, int(TokenLen))
+	var rw MustReadWriter
+	SecretLen := rw.ReadInt16(r)
+	p.Secret = rw.ReadByteArray(r, int(SecretLen))
+	TokenLen := rw.ReadInt16(r)
+	p.Token = rw.ReadByteArray(r, int(TokenLen))
 
 	return rw.Result()
 }
 
 func (p *EncryptionKeyResponse) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt16(w, int16(len(p.Secret)))
-	rw.MustWriteByteArray(w, p.Secret)
-	rw.MustWriteInt16(w, int16(len(p.Token)))
-	rw.MustWriteByteArray(w, p.Token)
+	rw.WriteInt16(w, int16(len(p.Secret)))
+	rw.WriteByteArray(w, p.Secret)
+	rw.WriteInt16(w, int16(len(p.Token)))
+	rw.WriteByteArray(w, p.Token)
 
 	return rw.Result()
 }
@@ -2680,25 +2677,25 @@ type EncryptionKeyRequest struct {
 
 func (p EncryptionKeyRequest) Id() byte { return 0xFD }
 func (p *EncryptionKeyRequest) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.ServerId = rw.MustReadString(r)
-	PublicKeyLen := int(rw.MustReadInt16(r))
-	p.PublicKey = rw.MustReadByteArray(r, PublicKeyLen)
-	TokenLen := int(rw.MustReadInt16(r))
-	p.Token = rw.MustReadByteArray(r, TokenLen)
+	var rw MustReadWriter
+	p.ServerId = rw.ReadString(r)
+	PublicKeyLen := int(rw.ReadInt16(r))
+	p.PublicKey = rw.ReadByteArray(r, PublicKeyLen)
+	TokenLen := int(rw.ReadInt16(r))
+	p.Token = rw.ReadByteArray(r, TokenLen)
 
 	return rw.Result()
 }
 
 func (p *EncryptionKeyRequest) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.ServerId)
-	rw.MustWriteInt16(w, int16(len(p.PublicKey)))
-	rw.MustWriteByteArray(w, p.PublicKey)
-	rw.MustWriteInt16(w, int16(len(p.Token)))
-	rw.MustWriteByteArray(w, p.Token)
+	rw.WriteString(w, p.ServerId)
+	rw.WriteInt16(w, int16(len(p.PublicKey)))
+	rw.WriteByteArray(w, p.PublicKey)
+	rw.WriteInt16(w, int16(len(p.Token)))
+	rw.WriteByteArray(w, p.Token)
 
 	return rw.Result()
 }
@@ -2711,17 +2708,17 @@ type ServerListPing struct {
 
 func (p ServerListPing) Id() byte { return 0xFE }
 func (p *ServerListPing) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Magic = rw.MustReadInt8(r)
+	var rw MustReadWriter
+	p.Magic = rw.ReadInt8(r)
 
 	return rw.Result()
 }
 
 func (p *ServerListPing) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteInt8(w, p.Magic)
+	rw.WriteInt8(w, p.Magic)
 
 	return rw.Result()
 }
@@ -2734,17 +2731,17 @@ type Disconnect struct {
 
 func (p Disconnect) Id() byte { return 0xFF }
 func (p *Disconnect) ReadFrom(r io.Reader) (n int64, err error) {
-	rw.Reset()
-	p.Reason = rw.MustReadString(r)
+	var rw MustReadWriter
+	p.Reason = rw.ReadString(r)
 
 	return rw.Result()
 }
 
 func (p *Disconnect) WriteTo(w io.Writer) (n int64, err error) {
-	rw.Reset()
+	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.MustWriteString(w, p.Reason)
+	rw.WriteString(w, p.Reason)
 
 	return rw.Result()
 }
