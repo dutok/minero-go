@@ -2,7 +2,6 @@ package ping
 
 import (
 	"strings"
-	"unicode/utf16"
 
 	"github.com/toqueteos/minero/proto/packet"
 )
