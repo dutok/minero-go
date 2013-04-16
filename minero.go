@@ -2,6 +2,7 @@
 package minero
 
 const (
-	Proto  = "60"
-	Server = "1.5"
+	ProtoNum = 60
+	Proto    = "60"
+	Server   = "1.5"
 )
