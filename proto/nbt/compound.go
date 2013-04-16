@@ -52,11 +52,11 @@ func (c *Compound) String() string {
 	var compound []string
 
 	for k, v := range c.Value {
-		compound = append(compound, fmt.Sprintf("%q: %v", k, v))
+		compound = append(compound, fmt.Sprintf("%q: %v,", k, v))
 	}
 
-	content := strings.Join(compound, ",\n")
-	return fmt.Sprintf("NBT_Compound(size: %d) {\n%s\n}", len(c.Value), content)
+	content := strings.Join(compound, "")
+	return fmt.Sprintf("Compound with %d elems {%s}", len(c.Value), content)
 }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.

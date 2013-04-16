@@ -19,7 +19,7 @@ func (s String) Type() TagType          { return TagString }
 func (s String) Size() int64            { return int64(2 + len(s.Value)) }
 func (s String) Lookup(path string) Tag { return nil }
 func (s String) String() string {
-	return fmt.Sprintf("NBT_String(size: %d) %q", len(s.Value), s.Value)
+	return fmt.Sprintf("%q (string)", s.Value)
 }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.

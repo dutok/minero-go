@@ -39,7 +39,7 @@ func (arr ByteArray) Size() int64            { return int64(4 + len(arr.Value)) 
 func (arr ByteArray) Lookup(path string) Tag { return nil }
 
 func (arr ByteArray) String() string {
-	return fmt.Sprintf("NBT_ByteArray(size: %d)", len(arr.Value))
+	return fmt.Sprintf("Array(%d x Byte)", len(arr.Value))
 }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
@@ -103,7 +103,7 @@ func (arr IntArray) Type() TagType          { return TagIntArray }
 func (arr IntArray) Size() int64            { return int64(4 + len(arr.Value)) }
 func (arr IntArray) Lookup(path string) Tag { return nil }
 func (arr IntArray) String() string {
-	return fmt.Sprintf("NBT_IntArray(size: %d)", len(arr.Value))
+	return fmt.Sprintf("Array(%d x Int)", len(arr.Value))
 }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.

@@ -3,6 +3,7 @@ package nbt
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/toqueteos/minero/types"
 )
@@ -26,7 +27,14 @@ func (l List) Size() (n int64) {
 }
 func (l List) Lookup(path string) Tag { return nil }
 func (l List) String() string {
-	return fmt.Sprintf("NBT_List(size: %d) % s", len(l.Value), l.Value)
+	var list []string
+
+	for i, v := range l.Value {
+		list = append(list, fmt.Sprintf("%d: %v,", i, v))
+	}
+
+	content := strings.Join(list, "")
+	return fmt.Sprintf("List of %s with %d elems [%s]", l.Typ, len(l.Value), content)
 }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.

@@ -13,7 +13,7 @@ func (e End) Name() string           { return "TagEnd" }
 func (e End) Type() TagType          { return TagEnd }
 func (e End) Size() int64            { return 1 }
 func (e End) Lookup(path string) Tag { return nil }
-func (e End) String() string         { return "NBT_End" }
+func (e End) String() string         { return "End" }
 
 // ReadFrom satifies io.ReaderFrom interface. TypeId is not decoded.
 func (e *End) ReadFrom(r io.Reader) (n int64, err error) {
