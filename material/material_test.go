@@ -11,8 +11,7 @@ var fromNameTests = []struct {
 	{"", Air},
 	{"Air", Air},
 	{"Bedrock", Bedrock},
-	{"FishingRod", ItemFishingRod},
-	{"ItemFishingRod", ItemFishingRod},
+	{"FishingRod", FishingRod},
 	{"Far", DiscFar},
 	{"DiscFar", DiscFar},
 }
@@ -32,7 +31,8 @@ var fromIdTests = []struct {
 }{
 	{-1, Air},
 	{0, Air},
-	{346, ItemFishingRod},
+	{7, Bedrock},
+	{346, FishingRod},
 	{2260, DiscFar},
 }
 

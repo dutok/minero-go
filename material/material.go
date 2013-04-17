@@ -92,12 +92,10 @@ func (m Material) IsDisc() bool {
 
 func (m Material) IsEdible() bool {
 	switch m {
-	case ItemBread, ItemCarrot, ItemPotatoBaked, ItemPotato,
-		ItemPotatoPoisonous, ItemCarrotGolden, ItemPumpkinPie, ItemCookie,
-		ItemMelon, ItemMushroomStew, ItemRawChicken, ItemCookedChicken,
-		ItemRawSteak, ItemCookedSteak, ItemRawFish, ItemCookedFish,
-		ItemRawPorkchop, ItemCookedPorkchop, ItemApple, ItemAppleGolden,
-		ItemRottenFlesh, ItemEyeSpider:
+	case Bread, CarrotItem, PotatoBaked, PotatoItem, PotatoPoisonous,
+		CarrotGolden, PumpkinPie, Cookie, MelonItem, MushroomStew, RawChicken,
+		CookedChicken, RawSteak, CookedSteak, RawFish, CookedFish, RawPorkchop,
+		CookedPorkchop, AppleItem, AppleGolden, RottenFlesh, EyeSpider:
 		return true
 	}
 	return false
