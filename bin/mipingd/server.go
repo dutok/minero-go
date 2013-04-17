@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net"
-	"strings"
 
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/proto/ping"
