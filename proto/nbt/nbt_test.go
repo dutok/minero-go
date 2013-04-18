@@ -195,7 +195,7 @@ func TestRead(t *testing.T) {
 	for _, test := range simpleTests {
 		// Read byte blob
 		r := bytes.NewBuffer(test.in)
-		c, err := ReadRaw(r)
+		c, err := Read(r)
 
 		// Expected errors?
 		if test.err != err {
