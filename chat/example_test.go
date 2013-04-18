@@ -1,6 +1,13 @@
 package chat_test
 
+import (
+	"fmt"
+
+	"github.com/toqueteos/minero/chat"
+)
+
 func ExampleTranslate() {
-	Translate("Roses are &cred&r. Violets are &9blue§r. Let's f***!", "&")
-	// Output: "Roses are §cred§r. Violets are §9blue§r. Let's f***!"
+	t := chat.Translate("Roses are &cred&r. Violets are &9blue§r. Let's f***!", "&")
+	fmt.Println(t)
+	// Output: Roses are §cred§r. Violets are §9blue§r. Let's f***!
 }
