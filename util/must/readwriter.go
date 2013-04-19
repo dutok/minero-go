@@ -28,7 +28,7 @@ func (rw ReadWriter) Must(n int64, err error) {
 	rw.Err = err
 }
 
-// Result returns all bytes read by r and the first error found.
+// Result returns all bytes read and the first error found.
 func (rw ReadWriter) Result() (n int64, err error) {
 	return rw.N, rw.Err
 }
