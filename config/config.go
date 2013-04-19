@@ -1,62 +1,64 @@
-// Simple configuration file format.
-//
-// Input:
-//
-//   a:
-//    b:
-//     c: 2
-//     d: 3
-//    e:
-//     f: 5
-//   g:
-//    h: 7
-//
-// Go:
-//
-//   var config = []*Section{
-//      &Section{"a", "0", 0, []*Section{
-//          &Section{"b", "1", 1, []*Section{
-//              &Section{"c", "2", 2, nil},
-//              &Section{"d", "3", 2, nil},
-//          }},
-//          &Section{"e", "4", 1, []*Section{
-//              &Section{"f", "5", 2, nil},
-//          }},
-//      }},
-//      &Section{"g", "6", 0, []*Section{
-//          &Section{"h", "7", 1, nil},
-//      }},
-//   }
 package config
 
 import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strings"
 )
 
+// Map holds all key/value pairs within a Config.
 type Map map[string]string
 
+func (m Map) String() string {
+	return "Map{\n" + SortedMap(m) + "\n}"
+}
+
+// Config wraps an unexported Map with methods for parsing and type conversion.
 type Config struct {
 	parsed      bool
 	file, input string
 	root        Map // Stores key/value pairs
 }
 
-func New() *Config                   { return &Config{root: make(Map)} }
-func (c Config) Len() int            { return len(c.root) }
-func (c Config) String() string      { return fmt.Sprintf("%s", c.root) }
-func (c Config) Get(k string) string { return c.root[k] }
-func (c Config) Set(k, v string)     { c.root[k] = v }
+// New creates and initializes a new Config.
+func New() *Config { return &Config{root: make(Map)} }
 
-func (c *Config) Parse(s string) error {
+// NewFrom creates and initializes a new Config using m as its initial contents.
+func NewFrom(m Map) *Config { return &Config{root: m} }
+
+// String returns the pretty-printed contents of this Config's underlying Map
+// sorted by key name.
+func (c Config) String() string { return c.root.String() }
+
+// Len returns the number of entries in this Config
+func (c Config) Len() int { return len(c.root) }
+
+// Get retrieves a pair value by its key name.
+func (c Config) Get(k string) string { return c.root[k] }
+
+// Set sets a key/value pair. Setting an existing key overwrites it.
+func (c Config) Set(k, v string) { c.root[k] = v }
+
+// Copy copies this Config's underlying Map and returns that copy.
+func (c Config) Copy() (m Map) {
+	m = make(Map)
+	for k, v := range c.root {
+		m[k] = v
+	}
+	return
+}
+
+// Parse parses a string into a config.
+func (c Config) Parse(s string) error {
 	c.file = "<string>"
 	c.input = s
 	return c.parse()
 }
 
-func (c *Config) ParseFile(f string) error {
+// Parse parses a file's contents into a config.
+func (c Config) ParseFile(f string) error {
 	buf, err := ioutil.ReadFile(f)
 	if err != nil {
 		log.Fatalf("Couldn't read config file %q.", f)
@@ -66,7 +68,7 @@ func (c *Config) ParseFile(f string) error {
 	return c.parse()
 }
 
-func (c *Config) parse() error {
+func (c Config) parse() error {
 	if c.parsed {
 		return nil
 	}
@@ -123,7 +125,7 @@ func (c *Config) parse() error {
 }
 
 // hasRoot ensures a chain of sections exists, linking levels [0, end].
-func (c *Config) hasRoot(chain []string, end int) bool {
+func (c Config) hasRoot(chain []string, end int) bool {
 	for i := 0; i < end; i++ {
 		if chain[i] == "" {
 			return false
@@ -132,9 +134,20 @@ func (c *Config) hasRoot(chain []string, end int) bool {
 	return true
 }
 
-func (c *Config) SaveTo(f string) error {
-	s := fmt.Sprintf("%s", c.root)
-	return ioutil.WriteFile(f, []byte(s), 0666)
+// SortedMap sorts a Map by its keys and returns it as a string
+func SortedMap(m Map) string {
+	var keys []string
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var values []string
+	for _, k := range keys {
+		values = append(values, fmt.Sprintf("%q: %s", k, m[k]))
+	}
+	r := strings.Join(values, "\n")
+	return fmt.Sprintf("%s", r)
 }
 
 func lineLevel(s string) (n int) {
