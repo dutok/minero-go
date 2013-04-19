@@ -1,2 +1,2 @@
-// Utility helpers for minero.
+// Utility helpers.
 package util
