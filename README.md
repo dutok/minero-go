@@ -26,6 +26,10 @@ Features
 
 Tools
 =====
+- Minero server: [`bin/minero`](https://github.com/toqueteos/minero/blob/master/bin/minero)
+
+        go get github.com/toqueteos/minero/bin/minero
+
 - NBT pretty printer: [`bin/minbtd`](https://github.com/toqueteos/minero/blob/master/bin/minbtd)
 
         go get github.com/toqueteos/minero/bin/minbtd
