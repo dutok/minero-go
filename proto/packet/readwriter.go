@@ -79,7 +79,7 @@ func (rw MustReadWriter) ReadSlot(r io.Reader) (res *mct.Slot) {
 		return
 	}
 
-	t := new(mct.Slot)
+	t := mct.NewSlot()
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("ReadSlot: %s", err)
