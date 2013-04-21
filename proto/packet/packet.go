@@ -1878,6 +1878,10 @@ func (p *EntityGlobalSpawn) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 // WindowOpen is a server to client packet.
+//
+// Sent when NMC should open an inventory (chest, workbench, furnace, etc...).
+// Not sent when client opens his inventory.
+//
 // Total Size: 7 bytes + length of string
 type WindowOpen struct {
 	WindowId         int8   // Unique Window Id number. NMS: counter, starting at 1.
