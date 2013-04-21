@@ -14,11 +14,11 @@ func Ping(s []string) *packet.Disconnect {
 }
 
 // Prepare returns a ServerListPing-able string ready to be sent over the wire.
-func Prepare(motd, players, playersMax string) []string {
+func Prepare(motd, in, max string) []string {
 	return []string{
 		"§1",
 		minero.Proto, minero.Server,
 		motd,
-		players, playersMax,
+		in, max,
 	}
 }
