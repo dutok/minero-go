@@ -80,6 +80,7 @@ type LoginInfo struct {
 func (p LoginInfo) Id() byte { return 0x01 }
 func (p *LoginInfo) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
+	p.Entity = rw.ReadInt32(r)
 	p.LevelType = rw.ReadString(r)
 	p.GameMode = rw.ReadInt8(r)
 	p.Dimension = rw.ReadInt8(r)
@@ -93,6 +94,7 @@ func (p *LoginInfo) WriteTo(w io.Writer) (n int64, err error) {
 	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
+	rw.WriteInt32(w, p.Entity)
 	rw.WriteString(w, p.LevelType)
 	rw.WriteInt8(w, p.GameMode)
 	rw.WriteInt8(w, p.Dimension)
