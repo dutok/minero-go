@@ -27,8 +27,6 @@ func HandleFC(s *Server, player *player.Player) {
 		return
 	}
 
-	log.Println("Shared secret length:", len(secret))
-
 	// Ensure player is legit
 	if !s.CheckUser(player.Name, secret) {
 		log.Println("Failed to verify username!")
@@ -45,6 +43,4 @@ func HandleFC(s *Server, player *player.Player) {
 	player.Secret = secret
 	player.OnlineMode(true)
 	log.Println("Enabling encryption.")
-
-	log.Println("HandleFC -> EncryptionKeyRequest")
 }

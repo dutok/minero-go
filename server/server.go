@@ -118,11 +118,13 @@ func (s *Server) Handle(c net.Conn) {
 			return
 		}
 		pid := buf[0]
-		log.Printf("Packet: %#x\n", pid)
+		// log.Printf("Packet: %#x\n", pid)
 
 		h := HandlerFor[pid]
 		if h != nil {
 			h(s, p)
+		} else {
+			log.Fatalf("Can't handle packet %#x. Closing", pid)
 		}
 	}
 }

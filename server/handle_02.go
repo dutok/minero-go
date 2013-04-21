@@ -13,7 +13,7 @@ func Handle02(s *Server, player *player.Player) {
 	p := new(packet.Handshake)
 	p.ReadFrom(player.Conn)
 
-	log.Printf("Handshake from: %s [%s]", p.Username, player.Net.RemoteAddr())
+	log.Printf("Handshake from: %q [%s]", p.Username, player.Net.RemoteAddr())
 
 	if p.Version != minero.ProtoNum {
 		log.Printf("Wrong Protocol version. Player: %d, Server: %d\n",
@@ -34,7 +34,5 @@ func Handle02(s *Server, player *player.Player) {
 		}
 		r.WriteTo(player.Conn)
 		player.Token = r.Token
-
-		log.Println("Handle02 -> EncryptionKeyRequest")
 	}
 }
