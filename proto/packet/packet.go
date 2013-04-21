@@ -504,8 +504,8 @@ func (p *PlayerPosLook) WriteTo(w io.Writer) (n int64, err error) {
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 	rw.WriteFloat64(w, p.X)
-	rw.WriteFloat64(w, p.Y)
-	rw.WriteFloat64(w, p.Stance)
+	rw.WriteFloat64(w, p.Stance) // Switched with Y
+	rw.WriteFloat64(w, p.Y)      // Switched with Stance
 	rw.WriteFloat64(w, p.Z)
 	rw.WriteFloat32(w, p.Yaw)
 	rw.WriteFloat32(w, p.Pitch)
