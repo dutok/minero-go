@@ -13,6 +13,7 @@ type HandlerFunc func(*Server, *player.Player)
 
 // Packet Id is only read for "Client -> Server" packets
 var HandlerFor = map[byte]HandlerFunc{
+	0x00: HandlerFunc(Handle00), // KeepAlive
 	0x02: HandlerFunc(Handle02), // Handshake
 	0x03: HandlerFunc(Handle03), // ChatMessage
 	0x07: HandlerFunc(Handle07), // EntityInteract
