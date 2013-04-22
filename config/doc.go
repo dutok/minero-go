@@ -1,17 +1,17 @@
 // Simple configuration file format.
 //
 // Properties:
-// - Less verbose than JSON.
-// - Simpler than YAML.
-// - Easy parsing.
-// - Indentation based.
+//   - Less verbose than JSON.
+//   - Simpler than YAML.
+//   - Easy parsing.
+//   - Indentation based.
 //
 // Notes on Indentation:
-// - Spaces and tabs are equivalent here. Examples:
-//   "  \t" == "\t\t " // true
-//   "   " == "\t\t\t" // true
-// - You can mix both, although it's not recomended.
-// - Indentation level is computed using: level = num_tabs + num_spaces.
+//   - Spaces and tabs are equivalent here. Examples:
+//     "  \t" == "\t\t " // true
+//     "   " == "\t\t\t" // true
+//   - You can mix both, although it's not recomended.
+//   - Indentation level is computed using: level = num_tabs + num_spaces.
 //
 // Example input:
 //
