@@ -12,5 +12,5 @@ func Handle0C(s *Server, player *player.Player) {
 	p := new(packet.PlayerLook)
 	p.ReadFrom(player.Conn)
 
-	log.Printf("PlayerLook: +v", p)
+	log.Printf("PlayerLook: %+v", p)
 }
