@@ -12,6 +12,7 @@ import (
 	"io"
 
 	mct "github.com/toqueteos/minero/types/minecraft"
+	"github.com/toqueteos/minero/util/abs"
 )
 
 type Packet interface {
@@ -1093,15 +1094,15 @@ func (p *EntityRelMove) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 7 bytes
 type EntityLook struct {
 	Entity     int32
-	Yaw, Pitch int8 // The X & Y Axis rotation as a fraction of 360
+	Yaw, Pitch float32 // The X & Y Axis rotation as a fraction of 360
 }
 
 func (p EntityLook) Id() byte { return 0x20 }
 func (p *EntityLook) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.Entity = rw.ReadInt32(r)
-	p.Yaw = rw.ReadInt8(r)
-	p.Pitch = rw.ReadInt8(r)
+	p.Yaw = abs.RealLook(rw.ReadInt8(r))
+	p.Pitch = abs.RealLook(rw.ReadInt8(r))
 
 	return rw.Result()
 }
@@ -1111,8 +1112,8 @@ func (p *EntityLook) WriteTo(w io.Writer) (n int64, err error) {
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.Entity)
-	rw.WriteInt8(w, p.Yaw)
-	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt8(w, abs.Look(p.Yaw))
+	rw.WriteInt8(w, abs.Look(p.Pitch))
 
 	return rw.Result()
 }
@@ -1162,19 +1163,19 @@ func (p *EntityLookRelMove) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 19 bytes
 type EntityTeleport struct {
 	Entity     int32
-	X, Y, Z    int32 // Position as an Absolute Integer
-	Yaw, Pitch int8  // The X & Y Axis rotation as a fraction of 360
+	X, Y, Z    float64 // Position as an Absolute Integer
+	Yaw, Pitch float32 // The X & Y Axis rotation as a fraction of 360
 }
 
 func (p EntityTeleport) Id() byte { return 0x22 }
 func (p *EntityTeleport) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.Entity = rw.ReadInt32(r)
-	p.X = rw.ReadInt32(r)
-	p.Y = rw.ReadInt32(r)
-	p.Z = rw.ReadInt32(r)
-	p.Yaw = rw.ReadInt8(r)
-	p.Pitch = rw.ReadInt8(r)
+	p.X = abs.RealPos(rw.ReadInt32(r))
+	p.Y = abs.RealPos(rw.ReadInt32(r))
+	p.Z = abs.RealPos(rw.ReadInt32(r))
+	p.Yaw = abs.RealLook(rw.ReadInt8(r))
+	p.Pitch = abs.RealLook(rw.ReadInt8(r))
 
 	return rw.Result()
 }
@@ -1184,11 +1185,11 @@ func (p *EntityTeleport) WriteTo(w io.Writer) (n int64, err error) {
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.Entity)
-	rw.WriteInt32(w, p.X)
-	rw.WriteInt32(w, p.Y)
-	rw.WriteInt32(w, p.Z)
-	rw.WriteInt8(w, p.Yaw)
-	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt32(w, abs.Pos(p.X))
+	rw.WriteInt32(w, abs.Pos(p.Y))
+	rw.WriteInt32(w, abs.Pos(p.Z))
+	rw.WriteInt8(w, abs.Look(p.Yaw))
+	rw.WriteInt8(w, abs.Look(p.Pitch))
 
 	return rw.Result()
 }
@@ -1197,14 +1198,14 @@ func (p *EntityTeleport) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 6 bytes
 type EntityHeadLook struct {
 	Entity  int32
-	HeadYaw int8 // Head yaw in steps of 2p/256
+	HeadYaw float32 // Head yaw in steps of 2p/256
 }
 
 func (p EntityHeadLook) Id() byte { return 0x23 }
 func (p *EntityHeadLook) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.Entity = rw.ReadInt32(r)
-	p.HeadYaw = rw.ReadInt8(r)
+	p.HeadYaw = abs.RealLook(rw.ReadInt8(r))
 
 	return rw.Result()
 }
@@ -1214,7 +1215,7 @@ func (p *EntityHeadLook) WriteTo(w io.Writer) (n int64, err error) {
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.Entity)
-	rw.WriteInt8(w, p.HeadYaw)
+	rw.WriteInt8(w, abs.Look(p.HeadYaw))
 
 	return rw.Result()
 }
