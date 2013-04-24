@@ -8,9 +8,9 @@ import (
 )
 
 // Handle0E handles incoming requests of packet 0x0E: PlayerAction
-func Handle0E(s *Server, player *player.Player) {
-	p := new(packet.PlayerAction)
-	p.ReadFrom(player.Conn)
+func Handle0E(server *Server, sender *player.Player) {
+	pkt := new(packet.PlayerAction)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("PlayerAction: %+v", p)
+	log.Printf("PlayerAction: %+v", pkt)
 }

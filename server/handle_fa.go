@@ -8,9 +8,9 @@ import (
 )
 
 // HandleFA handles incoming requests of packet 0xFA: PluginMessage
-func HandleFA(s *Server, player *player.Player) {
-	p := new(packet.PluginMessage)
-	p.ReadFrom(player.Conn)
+func HandleFA(server *Server, sender *player.Player) {
+	pkt := new(packet.PluginMessage)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("PluginMessage: %+v", p)
+	log.Printf("PluginMessage: %+v", pkt)
 }

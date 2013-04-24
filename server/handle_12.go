@@ -8,9 +8,9 @@ import (
 )
 
 // Handle12 handles incoming requests of packet 0x12: Animation
-func Handle12(s *Server, player *player.Player) {
-	p := new(packet.Animation)
-	p.ReadFrom(player.Conn)
+func Handle12(server *Server, sender *player.Player) {
+	pkt := new(packet.Animation)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("Animation: %+v", p)
+	log.Printf("Animation: %+v", pkt)
 }

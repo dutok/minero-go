@@ -6,9 +6,8 @@ import (
 )
 
 // Handle0B handles incoming requests of packet 0x0B: PlayerPos
-func Handle0B(s *Server, player *player.Player) {
-	p := new(packet.PlayerPos)
-	p.ReadFrom(player.Conn)
-
-	// log.Printf("PlayerPos: %+v", p)
+func Handle0B(server *Server, sender *player.Player) {
+	pkt := new(packet.PlayerPos)
+	pkt.ReadFrom(sender.Conn)
+	// server.BroadcastOthers(sender, pkt)
 }

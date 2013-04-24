@@ -8,9 +8,9 @@ import (
 )
 
 // Handle13 handles incoming requests of packet 0x13: EntityAction
-func Handle13(s *Server, player *player.Player) {
-	p := new(packet.EntityAction)
-	p.ReadFrom(player.Conn)
+func Handle13(server *Server, sender *player.Player) {
+	pkt := new(packet.EntityAction)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("EntityAction: %+v", p)
+	log.Printf("EntityAction: %+v", pkt)
 }

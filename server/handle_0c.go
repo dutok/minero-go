@@ -1,16 +1,19 @@
 package server
 
 import (
-	"log"
-
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
 
 // Handle0C handles incoming requests of packet 0x0C: PlayerLook
-func Handle0C(s *Server, player *player.Player) {
-	p := new(packet.PlayerLook)
-	p.ReadFrom(player.Conn)
+func Handle0C(server *Server, sender *player.Player) {
+	pkt := new(packet.PlayerLook)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("PlayerLook: %+v", p)
+	resp := &packet.EntityLook{
+		Entity: sender.Id(),
+		Yaw:    pkt.Yaw,
+		Pitch:  pkt.Pitch,
+	}
+	server.BroadcastOthers(sender, resp)
 }

@@ -1,16 +1,18 @@
 package server
 
 import (
-	"log"
-
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
 
 // Handle0A handles incoming requests of packet 0x0A: Player
-func Handle0A(s *Server, player *player.Player) {
-	p := new(packet.Player)
-	p.ReadFrom(player.Conn)
+func Handle0A(server *Server, sender *player.Player) {
+	pkt := new(packet.Player)
+	pkt.ReadFrom(sender.Conn)
+	// server.BroadcastOthers(sender, pkt)
 
-	log.Printf("Player: %+v", p)
+	resp := &packet.Entity{
+		Entity: sender.Id(),
+	}
+	server.BroadcastOthers(sender, resp)
 }

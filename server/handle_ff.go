@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/toqueteos/minero/proto/packet"
@@ -8,9 +9,14 @@ import (
 )
 
 // HandleFF handles incoming requests of packet 0xFF: Disconnect
-func HandleFF(s *Server, player *player.Player) {
-	p := new(packet.Disconnect)
-	p.ReadFrom(player.Conn)
+func HandleFF(server *Server, sender *player.Player) {
+	pkt := new(packet.Disconnect)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("Player %q exit. Reason: %s", player.Name, p.Reason)
+	log.Printf("Player %q exit. Reason: %s", sender.Name, pkt.Reason)
+
+	// Send message to all other players
+	msg := fmt.Sprintf("%s disconnected.", sender.Name)
+	server.BroadcastMessage(msg)
+	server.RemPlayer(sender)
 }

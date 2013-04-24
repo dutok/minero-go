@@ -8,9 +8,9 @@ import (
 )
 
 // Handle00 handles incoming requests of packet 0x00: KeepAlive
-func Handle00(s *Server, player *player.Player) {
-	p := new(packet.KeepAlive)
-	p.ReadFrom(player.Conn)
+func Handle00(server *Server, sender *player.Player) {
+	pkt := new(packet.KeepAlive)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("KeepAlive: %+v", p)
+	log.Printf("KeepAlive: %+v", pkt)
 }

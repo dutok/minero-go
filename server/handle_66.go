@@ -8,9 +8,9 @@ import (
 )
 
 // Handle66 handles incoming requests of packet 0x66: WindowClick
-func Handle66(s *Server, player *player.Player) {
-	p := new(packet.WindowClick)
-	p.ReadFrom(player.Conn)
+func Handle66(server *Server, sender *player.Player) {
+	pkt := new(packet.WindowClick)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("WindowClick: %+v", p)
+	log.Printf("WindowClick: %+v", pkt)
 }

@@ -8,9 +8,9 @@ import (
 )
 
 // Handle0F handles incoming requests of packet 0x0F: PlayerBlockPlace
-func Handle0F(s *Server, player *player.Player) {
-	p := new(packet.PlayerBlockPlace)
-	p.ReadFrom(player.Conn)
+func Handle0F(server *Server, sender *player.Player) {
+	pkt := new(packet.PlayerBlockPlace)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("PlayerBlockPlace: %+v", p)
+	log.Printf("PlayerBlockPlace: %+v", pkt)
 }

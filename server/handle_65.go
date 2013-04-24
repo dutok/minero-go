@@ -8,9 +8,9 @@ import (
 )
 
 // Handle65 handles incoming requests of packet 0x65: WindowClose
-func Handle65(s *Server, player *player.Player) {
-	p := new(packet.WindowClose)
-	p.ReadFrom(player.Conn)
+func Handle65(server *Server, sender *player.Player) {
+	pkt := new(packet.WindowClose)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("WindowClose: %+v", p)
+	log.Printf("WindowClose: %+v", pkt)
 }

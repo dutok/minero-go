@@ -8,9 +8,9 @@ import (
 )
 
 // Handle6C handles incoming requests of packet 0x6C: EnchantItem
-func Handle6C(s *Server, player *player.Player) {
-	p := new(packet.EnchantItem)
-	p.ReadFrom(player.Conn)
+func Handle6C(server *Server, sender *player.Player) {
+	pkt := new(packet.EnchantItem)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("EnchantItem: %+v", p)
+	log.Printf("EnchantItem: %+v", pkt)
 }

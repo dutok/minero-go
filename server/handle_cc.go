@@ -8,9 +8,9 @@ import (
 )
 
 // HandleCC handles incoming requests of packet 0xCC: ClientSettings
-func HandleCC(s *Server, player *player.Player) {
-	p := new(packet.ClientSettings)
-	p.ReadFrom(player.Conn)
+func HandleCC(server *Server, sender *player.Player) {
+	pkt := new(packet.ClientSettings)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("ClientSettings: %+v", p)
+	log.Printf("ClientSettings: %+v", pkt)
 }

@@ -8,9 +8,9 @@ import (
 )
 
 // HandleCB handles incoming requests of packet 0xCB: TabComplete
-func HandleCB(s *Server, player *player.Player) {
-	p := new(packet.TabComplete)
-	p.ReadFrom(player.Conn)
+func HandleCB(server *Server, sender *player.Player) {
+	pkt := new(packet.TabComplete)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("TabComplete: %+v", p)
+	log.Printf("TabComplete: %+v", pkt)
 }

@@ -9,20 +9,20 @@ import (
 )
 
 // HandleFE handles incoming requests of packet 0xFE: ServerListPing
-func HandleFE(s *Server, player *player.Player) {
-	r := new(packet.ServerListPing)
-	r.ReadFrom(player.Conn)
+func HandleFE(server *Server, sender *player.Player) {
+	pkt := new(packet.ServerListPing)
+	pkt.ReadFrom(sender.Conn)
 
-	if r.Magic != 1 {
+	if pkt.Magic != 1 {
 		s := "Invalid %#x packet. Field Magic should be 1, got %d."
-		reason := fmt.Sprintf(s, r.Id(), r.Magic)
+		reason := fmt.Sprintf(s, pkt.Id(), pkt.Magic)
 		resp := packet.Disconnect{reason}
-		resp.WriteTo(player.Conn)
+		resp.WriteTo(sender.Conn)
 		return
 	}
 
-	in := fmt.Sprintf("%d", s.in)
-	max := fmt.Sprintf("%d", s.max)
-	resp := ping.Ping(ping.Prepare(s.Motd(), in, max))
-	resp.WriteTo(player.Conn)
+	in := fmt.Sprintf("%d", len(server.playerList))
+	max := server.config.Get("server.max_players")
+	resp := ping.Ping(ping.Prepare(server.Motd, in, max))
+	resp.WriteTo(sender.Conn)
 }

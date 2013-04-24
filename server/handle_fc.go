@@ -9,38 +9,37 @@ import (
 )
 
 // HandleFC handles incoming requests of packet 0xFC: EncryptionKeyResponse
-func HandleFC(s *Server, player *player.Player) {
-	p := new(packet.EncryptionKeyResponse)
-	p.ReadFrom(player.Conn)
+func HandleFC(server *Server, sender *player.Player) {
+	pkt := new(packet.EncryptionKeyResponse)
+	pkt.ReadFrom(sender.Conn)
 
 	// Decrypt shared secret and token with server's private key.
 	var secret, token []byte
 	// var err error
-	secret, _ = s.Decrypt(p.Secret)
-	token, _ = s.Decrypt(p.Token)
+	secret, _ = server.Decrypt(pkt.Secret)
+	token, _ = server.Decrypt(pkt.Token)
 
 	// Ensure token matches
-	if !bytes.Equal(token, player.Token) {
+	if !bytes.Equal(token, sender.Token) {
 		log.Println("Tokens don't match.")
 		r := &packet.Disconnect{Reason: ReasonPiratedGame}
-		r.WriteTo(player.Conn)
+		r.WriteTo(sender.Conn)
 		return
 	}
 
 	// Ensure player is legit
-	if !s.CheckUser(player.Name, secret) {
+	if !server.CheckUser(sender.Name, secret) {
 		log.Println("Failed to verify username!")
 		r := packet.Disconnect{"Failed to verify username!"}
-		r.WriteTo(player.Conn)
+		r.WriteTo(sender.Conn)
 		return
 	}
 
 	// Send empty EncryptionKeyResponse
 	r := new(packet.EncryptionKeyResponse)
-	r.WriteTo(player.Conn)
+	r.WriteTo(sender.Conn)
 
 	// Start AES/CFB8 stream encryption
-	player.Secret = secret
-	player.OnlineMode(true)
+	sender.OnlineMode(true, secret)
 	log.Println("Enabling encryption.")
 }

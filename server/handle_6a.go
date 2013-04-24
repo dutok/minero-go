@@ -8,9 +8,9 @@ import (
 )
 
 // Handle6A handles incoming requests of packet 0x6A: ConfirmTransaction
-func Handle6A(s *Server, player *player.Player) {
-	p := new(packet.ConfirmTransaction)
-	p.ReadFrom(player.Conn)
+func Handle6A(server *Server, sender *player.Player) {
+	pkt := new(packet.ConfirmTransaction)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("ConfirmTransaction: %+v", p)
+	log.Printf("ConfirmTransaction: %+v", pkt)
 }

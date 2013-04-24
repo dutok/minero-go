@@ -8,9 +8,9 @@ import (
 )
 
 // HandleCA handles incoming requests of packet 0xCA: PlayerAbilities
-func HandleCA(s *Server, player *player.Player) {
-	p := new(packet.PlayerAbilities)
-	p.ReadFrom(player.Conn)
+func HandleCA(server *Server, sender *player.Player) {
+	pkt := new(packet.PlayerAbilities)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("PlayerAbilities: %+v", p)
+	log.Printf("PlayerAbilities: %+v", pkt)
 }

@@ -8,9 +8,9 @@ import (
 )
 
 // Handle82 handles incoming requests of packet 0x82: SignUpdate
-func Handle82(s *Server, player *player.Player) {
-	p := new(packet.SignUpdate)
-	p.ReadFrom(player.Conn)
+func Handle82(server *Server, sender *player.Player) {
+	pkt := new(packet.SignUpdate)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("SignUpdate: %+v", p)
+	log.Printf("SignUpdate: %+v", pkt)
 }

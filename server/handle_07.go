@@ -8,9 +8,9 @@ import (
 )
 
 // Handle07 handles incoming requests of packet 0x07: EntityInteract
-func Handle07(s *Server, player *player.Player) {
-	p := new(packet.EntityInteract)
-	p.ReadFrom(player.Conn)
+func Handle07(server *Server, sender *player.Player) {
+	pkt := new(packet.EntityInteract)
+	pkt.ReadFrom(sender.Conn)
 
-	log.Printf("EntityInteract: %+v", p)
+	log.Printf("EntityInteract: %+v", pkt)
 }

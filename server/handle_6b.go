@@ -8,13 +8,13 @@ import (
 )
 
 // Handle6B handles incoming requests of packet 0x6B: CreativeInventoryAction
-func Handle6B(s *Server, player *player.Player) {
-	p := new(packet.CreativeInventoryAction)
-	p.ReadFrom(player.Conn)
+func Handle6B(server *Server, sender *player.Player) {
+	pkt := new(packet.CreativeInventoryAction)
+	pkt.ReadFrom(sender.Conn)
 
-	if p.Item != nil {
-		log.Printf("CreativeInventoryAction: %+v", p)
+	if pkt.Item != nil {
+		log.Printf("CreativeInventoryAction: %+v", pkt)
 	} else {
-		log.Println("Slot is nil")
+		log.Println("nil Slot")
 	}
 }
