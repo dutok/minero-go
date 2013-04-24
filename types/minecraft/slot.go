@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
-	"log"
 
 	"github.com/toqueteos/minero/proto/nbt"
 	"github.com/toqueteos/minero/util/must"
@@ -39,7 +38,6 @@ func (s *Slot) ReadFrom(r io.Reader) (n int64, err error) {
 	s.Amount = byte(rw.ReadInt8(r))
 	s.Damage = rw.ReadInt16(r)
 	Length := rw.ReadInt16(r)
-	log.Println("Length:", Length)
 
 	if Length == -1 {
 		return rw.Result()
