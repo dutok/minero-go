@@ -10,11 +10,11 @@ import (
 type Map map[string]string
 
 func (m Map) String() string {
-	return "Map{\n" + SortedMap(m) + "\n}"
+	return "Map{\n" + PrettyMap(m) + "\n}"
 }
 
-// SortedMap sorts a Map by its keys and returns it as a string
-func SortedMap(m Map) string {
+// PrettyMap sorts a Map by its keys and returns a pretty-printed string version.
+func PrettyMap(m Map) string {
 	var keys []string
 	for k, _ := range m {
 		keys = append(keys, k)
