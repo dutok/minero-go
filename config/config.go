@@ -3,17 +3,8 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
-	"sort"
 	"strings"
 )
-
-// Map holds all key/value pairs within a Config.
-type Map map[string]string
-
-func (m Map) String() string {
-	return "Map{\n" + SortedMap(m) + "\n}"
-}
 
 // Config wraps an unexported Map with methods for parsing and type conversion.
 type Config struct {
@@ -61,11 +52,17 @@ func (c Config) Parse(s string) error {
 func (c Config) ParseFile(f string) error {
 	buf, err := ioutil.ReadFile(f)
 	if err != nil {
-		log.Fatalf("Couldn't read config file %q.", f)
+		return fmt.Errorf("Couldn't read config file %q.", f)
 	}
 	c.file = f
 	c.input = string(buf)
 	return c.parse()
+}
+
+// Save saves a config into a file.
+func (c Config) Save(file string) error {
+	var s = SortedMap(c.root)
+	return ioutil.WriteFile(file, []byte(s), 0666)
 }
 
 func (c Config) parse() error {
@@ -80,14 +77,17 @@ func (c Config) parse() error {
 	var chain []string
 
 	for index, line := range strings.Split(c.input, "\n") {
-		values := strings.SplitN(line, ":", 2)
+		var (
+			values = strings.SplitN(line, ":", 2)
+			key    = strings.TrimSpace(values[0])
+		)
+
 		// Empty line
-		if len(values) == 1 {
+		if len(values) == 1 || strings.HasPrefix(key, "#") {
 			continue
 		}
 
 		var (
-			key   = strings.TrimSpace(values[0])
 			value = strings.TrimSpace(values[1])
 			level = lineLevel(line)
 		)
@@ -132,22 +132,6 @@ func (c Config) hasRoot(chain []string, end int) bool {
 		}
 	}
 	return true
-}
-
-// SortedMap sorts a Map by its keys and returns it as a string
-func SortedMap(m Map) string {
-	var keys []string
-	for k, _ := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var values []string
-	for _, k := range keys {
-		values = append(values, fmt.Sprintf("%q: %s", k, m[k]))
-	}
-	r := strings.Join(values, "\n")
-	return fmt.Sprintf("%s", r)
 }
 
 func lineLevel(s string) (n int) {
