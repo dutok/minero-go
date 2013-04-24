@@ -10,6 +10,6 @@ func main() {
 	log.SetPrefix("minero> ")
 	log.SetFlags(log.Ltime)
 
-	s := server.New("", "25600")
+	s := server.New(nil)
 	s.Run()
 }

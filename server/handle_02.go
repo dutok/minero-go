@@ -21,8 +21,6 @@ func Handle02(server *Server, sender *player.Player) {
 		return
 	}
 
-	// Get this player his own entity Id
-	sender.NewEntityId(pkt.Username)
 	// Save player to list
 	server.AddPlayer(sender)
 

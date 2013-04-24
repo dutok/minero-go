@@ -7,55 +7,78 @@ import (
 	"log"
 	prand "math/rand"
 	"net"
+	"sync"
 	"time"
 
+	"github.com/toqueteos/minero/command"
+	"github.com/toqueteos/minero/config"
 	"github.com/toqueteos/minero/proto/auth"
+	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
 
 type Server struct {
+	sync.Mutex
+
+	id string
+
+	net     net.Listener
+	working bool
+
+	config *config.Config
+
 	privKey *rsa.PrivateKey
-	pubEx   []byte
+	pubKey  []byte
 	token   []byte
 
-	id         string
-	host, port string
-	motd       string
+	// Message of the day. Text appears on server list.
+	Motd string
 
-	players map[string]*player.Player
-	in, max int // max players
+	// Stop message. Text appears on server list.
+	Stop string
+
+	cmdList    map[string]command.Cmder
+	playerList map[string]*player.Player
+	// pluginList map[string]*plugin.Plugin
+	// worldList  map[string]*world.World
 }
 
-func New(host, port string) *Server {
-	return &Server{
+func New(c *config.Config) *Server {
+	log.Println("Generating keypair.")
+
+	// Generate config
+	if c == nil {
+		c = config.New()
+		if err := c.ParseFile("./server.conf"); err != nil {
+			c = ConfigCreate()
+		}
+	}
+
+	s := &Server{
+		id:      serverId(),
+		config:  c,
 		privKey: auth.GenerateKeyPair(),
 
-		id:   serverId(),
-		host: host,
-		port: port,
-		motd: "Minero server", // Read this from config
-
-		players: make(map[string]*player.Player),
-		max:     64, // Read this from config
+		playerList: make(map[string]*player.Player),
 	}
+
+	return s
 }
 
 func (s Server) Id() string    { return s.id }
-func (s Server) Motd() string  { return s.motd }
 func (s Server) Token() []byte { return auth.EncryptionBytes() }
-func (s Server) Host() string  { return s.host }
-func (s Server) Port() string  { return s.port }
+func (s Server) CmdManager()   {}
 
 func (s *Server) PublicKey() []byte {
-	if s.pubEx == nil {
+	if s.pubKey == nil {
 		var err error
-		s.pubEx = auth.KeyExchange(&s.privKey.PublicKey)
-		if s.pubEx == nil {
+		s.pubKey = auth.KeyExchange(&s.privKey.PublicKey)
+		if s.pubKey == nil {
 			log.Fatal("Couldn't marshal public key:", err)
 			return nil
 		}
 	}
-	return s.pubEx
+	return s.pubKey
 }
 
 // Decrypt decrypts whatever the client encrypted with its keypair.
@@ -72,15 +95,20 @@ func (s *Server) CheckUser(name string, secret []byte) bool {
 }
 
 func (s *Server) Run() {
-	l, err := net.Listen("tcp", fmt.Sprintf("%s:%s", s.host, s.port))
+	var err error
+
+	addr := s.config.Get("server.host") + ":" + s.config.Get("server.port")
+	log.Printf("Listening on address: %q", addr)
+
+	s.net, err = net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer l.Close()
+	defer s.net.Close()
 
-	for {
+	for !s.working {
 		// Wait for a connection.
-		conn, err := l.Accept()
+		conn, err := s.net.Accept()
 		if err != nil {
 			log.Println(err)
 		}
@@ -97,28 +125,25 @@ func (s *Server) Handle(c net.Conn) {
 	defer log.Println("Connection closed:", c.RemoteAddr())
 	log.Println("Got connection from:", c.RemoteAddr())
 
-	// var buf = bufio.NewReader(c)
-	var buf = make([]byte, 1)
-
 	// Create player "instance"
 	p := player.New(c)
 
-	// Save it after successful login
-	// s.players[c.RemoteAddr().String()] = p
-	// s.in++
-	// defer func() {
-	// 	delete(s.players, c.RemoteAddr().String())
-	// 	s.in--
-	// }()
+	// Send KeepAlive packet every 35s (x20 in-game ticks)
+	go func() {
+		for _ = range time.Tick(35 * time.Second) {
+			r := &packet.KeepAlive{RandomId: prand.Int31()}
+			r.WriteTo(p.Conn)
+		}
+	}()
 
+	var buf = make([]byte, 1)
 	for {
 		n, err := p.Conn.Read(buf)
 		if n != 1 || err != nil {
-			log.Println("Server.Handle.ReadByte:", err)
+			// log.Println("Server.Handle.ReadByte:", err)
 			return
 		}
 		pid := buf[0]
-		// log.Printf("Packet: %#x\n", pid)
 
 		h := HandlerFor[pid]
 		if h != nil {
@@ -129,13 +154,34 @@ func (s *Server) Handle(c net.Conn) {
 	}
 }
 
-// func (s *Server) AddPlayer(c net.Conn) {
-// 	s.players[c.RemoteAddr().String()] = new(player.Player)
-// }
+func (s *Server) BroadcastOthers(p *player.Player, pkt packet.Packet) {
+	for _, pl := range s.playerList {
+		if pl.Ready && p.Name != pl.Name {
+			pkt.WriteTo(pl.Conn)
+		}
+	}
+}
+func (s *Server) BroadcastMessage(msg string) {
+	for _, p := range s.playerList {
+		if p.Ready {
+			p.SendMessage(msg)
+		}
+	}
+}
 
-// func (s *Server) GetPlayer(c net.Conn) *player.Player {
-// 	return s.players[c.RemoteAddr().String()]
-// }
+// AddPlayer
+func (s *Server) AddPlayer(p *player.Player) {
+	s.Lock()
+	s.playerList[p.Name] = p
+	s.Unlock()
+}
+
+// RemPlayer
+func (s *Server) RemPlayer(p *player.Player) {
+	s.Lock()
+	delete(s.playerList, p.Name)
+	s.Unlock()
+}
 
 func serverId() string {
 	return fmt.Sprintf("minero%x-%d", prand.Int31(), time.Now().Year())
