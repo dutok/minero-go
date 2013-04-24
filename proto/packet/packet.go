@@ -1390,10 +1390,10 @@ func (p *SetExperience) WriteTo(w io.Writer) (n int64, err error) {
 // ChunkData is a server to client packet.
 // Total Size: 18 bytes + len(ChunkData)
 type ChunkData struct {
-	X, Z               int32  // Chunk XZ Coordinate
-	GroundUpContinuous bool   // true = all sections in this vertical column, where the primary bitmap specifies exactly which sections are included, and which are air.
-	Primary            uint16 // Bitmask. 1 for every 16x16x16 section
-	Add                uint16 // Bitmask. 1 for every 16x16x16 section ("add" on payload)
+	X, Z           int32  // Chunk XZ Coordinate
+	AllColSections bool   // true = all sections in this vertical column, where the primary bitmap specifies exactly which sections are included, and which are air.
+	Primary        uint16 // Bitmask. 1 for every 16x16x16 section
+	Add            uint16 // Bitmask. 1 for every 16x16x16 section ("add" on payload)
 	// BUG(toqueteos): type should be proto/anvil/ChunkData instead of []byte
 	ChunkData []byte // ZLib Deflate compressed chunk data
 }
@@ -1403,7 +1403,7 @@ func (p *ChunkData) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.X = rw.ReadInt32(r)
 	p.Z = rw.ReadInt32(r)
-	p.GroundUpContinuous = rw.ReadBool(r)
+	p.AllColSections = rw.ReadBool(r)
 	p.Primary = uint16(rw.ReadInt16(r))
 	p.Add = uint16(rw.ReadInt16(r))
 	length := int(rw.ReadInt32(r))
@@ -1424,7 +1424,7 @@ func (p *ChunkData) WriteTo(w io.Writer) (n int64, err error) {
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.X)
 	rw.WriteInt32(w, p.Z)
-	rw.WriteBool(w, p.GroundUpContinuous)
+	rw.WriteBool(w, p.AllColSections)
 	rw.WriteInt16(w, int16(p.Primary))
 	rw.WriteInt16(w, int16(p.Add))
 	rw.WriteInt32(w, int32(len(p.ChunkData)))
@@ -1595,8 +1595,8 @@ func (p *BlockBreakAnimation) WriteTo(w io.Writer) (n int64, err error) {
 // MapChunkBulk is a server to client packet.
 // Total Size: 8 + (DataLength) + 12 * (Count) bytes
 type MapChunkBulk struct {
-	Count        int16  // len(Meta)
-	Length       int32  // len(ChunkData)
+	// Count  int16 // len(ChunkMeta)
+	// Length int32 // len(ChunkData)
 	SkylightSent bool   // Chunk data contains a light nibble array? true for overworld, false otherwise
 	ChunkData    []byte // Compressed chunk data
 	ChunkMeta    []ChunkMeta
@@ -1611,12 +1611,12 @@ type ChunkMeta struct {
 func (p MapChunkBulk) Id() byte { return 0x38 }
 func (p *MapChunkBulk) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
-	p.Count = rw.ReadInt16(r)
-	p.Length = rw.ReadInt32(r)
+	Count := rw.ReadInt16(r)
+	Length := rw.ReadInt32(r)
 	p.SkylightSent = rw.ReadBool(r)
-	p.ChunkData = rw.ReadByteArray(r, int(p.Length))
-	p.ChunkMeta = make([]ChunkMeta, p.Length)
-	for i := 0; i < int(p.Count); i++ {
+	p.ChunkData = rw.ReadByteArray(r, int(Length))
+	p.ChunkMeta = make([]ChunkMeta, Length)
+	for i := 0; i < int(Count); i++ {
 		p.ChunkMeta[i].X = rw.ReadInt32(r)
 		p.ChunkMeta[i].Z = rw.ReadInt32(r)
 		p.ChunkMeta[i].Primary = uint16(rw.ReadInt16(r))
@@ -1630,11 +1630,11 @@ func (p *MapChunkBulk) WriteTo(w io.Writer) (n int64, err error) {
 	var rw MustReadWriter
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
-	rw.WriteInt16(w, p.Count)
-	rw.WriteInt32(w, p.Length)
+	rw.WriteInt16(w, int16(len(p.ChunkMeta)))
+	rw.WriteInt32(w, int32(len(p.ChunkData)))
 	rw.WriteBool(w, p.SkylightSent)
 	rw.WriteByteArray(w, p.ChunkData)
-	for i := 0; i < int(p.Count); i++ {
+	for i := 0; i < len(p.ChunkMeta); i++ {
 		rw.WriteInt32(w, p.ChunkMeta[i].X)
 		rw.WriteInt32(w, p.ChunkMeta[i].Z)
 		rw.WriteInt16(w, int16(p.ChunkMeta[i].Primary))
