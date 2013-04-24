@@ -61,7 +61,7 @@ func (c Config) ParseFile(f string) error {
 
 // Save saves a config into a file.
 func (c Config) Save(file string) error {
-	var s = SortedMap(c.root)
+	var s = fileOutput(c.root)
 	return ioutil.WriteFile(file, []byte(s), 0666)
 }
 
