@@ -9,10 +9,7 @@ import (
 func Handle0A(server *Server, sender *player.Player) {
 	pkt := new(packet.Player)
 	pkt.ReadFrom(sender.Conn)
-	// server.BroadcastOthers(sender, pkt)
 
-	resp := &packet.Entity{
-		Entity: sender.Id(),
-	}
+	resp := &packet.Entity{sender.Id()}
 	server.BroadcastOthers(sender, resp)
 }
