@@ -1,3 +1,4 @@
+// Minecraft Server implementation in Go.
 package main
 
 import (
