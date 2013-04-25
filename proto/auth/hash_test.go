@@ -1,4 +1,3 @@
-//+build ignore
 package auth
 
 import (
