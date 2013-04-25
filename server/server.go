@@ -127,6 +127,9 @@ func (s *Server) Handle(c net.Conn) {
 
 	// Create player "instance"
 	p := player.New(c)
+	// Ensure player is deleted from online list, doesn't care about why he/she
+	// disconnects.
+	defer s.RemPlayer(p)
 
 	// Send KeepAlive packet every 35s (x20 in-game ticks)
 	go func() {

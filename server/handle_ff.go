@@ -18,5 +18,4 @@ func HandleFF(server *Server, sender *player.Player) {
 	// Send message to all other players
 	msg := fmt.Sprintf("%s disconnected.", sender.Name)
 	server.BroadcastMessage(msg)
-	server.RemPlayer(sender)
 }
