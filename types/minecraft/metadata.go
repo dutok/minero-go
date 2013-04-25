@@ -3,7 +3,6 @@ package minecraft
 import (
 	"encoding/binary"
 	"io"
-	// "strings"
 
 	"github.com/toqueteos/minero/types"
 )
