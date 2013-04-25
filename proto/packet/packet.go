@@ -730,10 +730,10 @@ func (p *EntityAction) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 22 bytes + length of strings + metadata (at least 1)
 type EntityNamedSpawn struct {
 	Entity     int32
-	Name       string // Max length: 16
-	X, Y, Z    int32  // Absolute Integer
-	Yaw, Pitch int8
-	Item       int16 // Item currently holding. 0: no item
+	Name       string  // Max length: 16
+	X, Y, Z    float64 // Absolute Integer
+	Yaw, Pitch float32 // Packed float
+	Item       int16   // Item currently holding. 0: no item
 	Metadata   *mct.Metadata
 }
 
@@ -742,11 +742,11 @@ func (p *EntityNamedSpawn) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.Entity = rw.ReadInt32(r)
 	p.Name = rw.ReadString(r)
-	p.X = rw.ReadInt32(r)
-	p.Y = rw.ReadInt32(r)
-	p.Z = rw.ReadInt32(r)
-	p.Yaw = rw.ReadInt8(r)
-	p.Pitch = rw.ReadInt8(r)
+	p.X = abs.RealPos(rw.ReadInt32(r))
+	p.Y = abs.RealPos(rw.ReadInt32(r))
+	p.Z = abs.RealPos(rw.ReadInt32(r))
+	p.Yaw = abs.RealLook(rw.ReadInt8(r))
+	p.Pitch = abs.RealLook(rw.ReadInt8(r))
 	p.Item = rw.ReadInt16(r)
 	p.Metadata = rw.ReadMetadata(r)
 
@@ -758,11 +758,11 @@ func (p *EntityNamedSpawn) WriteTo(w io.Writer) (n int64, err error) {
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.Entity)
 	rw.WriteString(w, p.Name)
-	rw.WriteInt32(w, p.X)
-	rw.WriteInt32(w, p.Y)
-	rw.WriteInt32(w, p.Z)
-	rw.WriteInt8(w, p.Yaw)
-	rw.WriteInt8(w, p.Pitch)
+	rw.WriteInt32(w, abs.Pos(p.X))
+	rw.WriteInt32(w, abs.Pos(p.Y))
+	rw.WriteInt32(w, abs.Pos(p.Z))
+	rw.WriteInt8(w, abs.Look(p.Yaw))
+	rw.WriteInt8(w, abs.Look(p.Pitch))
 	rw.WriteInt16(w, p.Item)
 	rw.WriteMetadata(w, p.Metadata)
 
