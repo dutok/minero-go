@@ -22,12 +22,12 @@ func Handle02(server *Server, sender *player.Player) {
 	}
 
 	// Save player to list
+	sender.Name = pkt.Username
 	server.AddPlayer(sender)
 
-	// BUG(toqueteos): OnlineMode = false sends 0x01 packet here
-	if false {
-		// ...
-	} else {
+	log.Println("online_mode =", server.config.Get("server.online_mode"))
+
+	if server.config.Get("server.online_mode") == "true" {
 		// Succesful handshake, prepare Encryption Request
 		r := packet.EncryptionKeyRequest{
 			ServerId:  server.Id(),
@@ -36,5 +36,7 @@ func Handle02(server *Server, sender *player.Player) {
 		}
 		r.WriteTo(sender.Conn)
 		sender.Token = r.Token
+	} else {
+		// BUG(toqueteos): server: Add online_mode=false support.
 	}
 }
