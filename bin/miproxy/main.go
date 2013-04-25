@@ -1,3 +1,4 @@
+// Server proxy and play session log recorder.
 package main
 
 import (
