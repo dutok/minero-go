@@ -15,6 +15,7 @@ import (
 	"github.com/toqueteos/minero/proto/auth"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
+	playerl "github.com/toqueteos/minero/server/player/list"
 )
 
 type Server struct {
@@ -38,7 +39,7 @@ type Server struct {
 	Stop string
 
 	cmdList    map[string]command.Cmder
-	playerList map[string]*player.Player
+	playerList playerl.List
 	// pluginList map[string]*plugin.Plugin
 	// worldList  map[string]*world.World
 }
@@ -59,7 +60,7 @@ func New(c *config.Config) *Server {
 		config:  c,
 		privKey: auth.GenerateKeyPair(),
 
-		playerList: make(map[string]*player.Player),
+		playerList: playerl.New(),
 	}
 
 	return s
@@ -172,18 +173,10 @@ func (s *Server) BroadcastMessage(msg string) {
 }
 
 // AddPlayer adds a player to server's player list.
-func (s *Server) AddPlayer(p *player.Player) {
-	s.Lock()
-	s.playerList[p.Name] = p
-	s.Unlock()
-}
+func (s *Server) AddPlayer(p *player.Player) { s.playerList.Add(p) }
 
 // RemPlayer removes a player from server's player list.
-func (s *Server) RemPlayer(p *player.Player) {
-	s.Lock()
-	delete(s.playerList, p.Name)
-	s.Unlock()
-}
+func (s *Server) RemPlayer(p *player.Player) { s.playerList.Rem(p.Name) }
 
 // Kick kicks a player from the server
 func (s *Server) Kick(p *player.Player) {
