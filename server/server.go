@@ -143,7 +143,6 @@ func (s *Server) Handle(c net.Conn) {
 	for {
 		n, err := p.Conn.Read(buf)
 		if n != 1 || err != nil {
-			// log.Println("Server.Handle.ReadByte:", err)
 			return
 		}
 		pid := buf[0]
@@ -187,9 +186,9 @@ func (s *Server) RemPlayer(p *player.Player) {
 }
 
 // Kick kicks a player from the server
-func (s *Server) Kick(p *player.Player, msg string) {
-	pkt.WriteTo(p.Conn)
-	msg = fmt.Sprintf("Player %q was kicked from the server.", p.Name)
+func (s *Server) Kick(p *player.Player) {
+	p.SendMessage("You were kicked from the server.")
+	msg := fmt.Sprintf("Player %q was kicked from the server.", p.Name)
 	s.BroadcastMessage(msg)
 }
 
