@@ -67,7 +67,7 @@ func (p *Player) SetReady() {
 }
 
 func (p *Player) SendMessage(msg string) {
-	pkt := packet.ChatMessage{msg}
+	pkt := &packet.ChatMessage{msg}
 	pkt.WriteTo(p.Conn)
 }
 
