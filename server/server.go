@@ -157,6 +157,7 @@ func (s *Server) Handle(c net.Conn) {
 	}
 }
 
+// BroadcastOthers sends a packet to all online players but p.
 func (s *Server) BroadcastOthers(p *player.Player, pkt packet.Packet) {
 	for _, pl := range s.playerList {
 		if pl.Ready && p.Name != pl.Name {
@@ -164,6 +165,8 @@ func (s *Server) BroadcastOthers(p *player.Player, pkt packet.Packet) {
 		}
 	}
 }
+
+// BroadcastMessage send a message to all online players.
 func (s *Server) BroadcastMessage(msg string) {
 	for _, p := range s.playerList {
 		if p.Ready {
@@ -187,11 +190,4 @@ func (s *Server) Kick(p *player.Player) {
 
 func serverId() string {
 	return fmt.Sprintf("minero%x-%d", prand.Int31(), time.Now().Year())
-}
-
-func yesno(b bool) string {
-	if b {
-		return "Yes"
-	}
-	return "No"
 }
