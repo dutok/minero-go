@@ -131,9 +131,9 @@ func (s *Server) Handle(c net.Conn) {
 	// disconnects.
 	defer s.RemPlayer(p)
 
-	// Send KeepAlive packet every 35s (x20 in-game ticks)
+	// Send KeepAlive packet every 30s (x20 in-game ticks)
 	go func() {
-		for _ = range time.Tick(35 * time.Second) {
+		for _ = range time.Tick(30 * time.Second) {
 			r := &packet.KeepAlive{RandomId: prand.Int31()}
 			r.WriteTo(p.Conn)
 		}
@@ -172,18 +172,25 @@ func (s *Server) BroadcastMessage(msg string) {
 	}
 }
 
-// AddPlayer
+// AddPlayer adds a player to server's player list.
 func (s *Server) AddPlayer(p *player.Player) {
 	s.Lock()
 	s.playerList[p.Name] = p
 	s.Unlock()
 }
 
-// RemPlayer
+// RemPlayer removes a player from server's player list.
 func (s *Server) RemPlayer(p *player.Player) {
 	s.Lock()
 	delete(s.playerList, p.Name)
 	s.Unlock()
+}
+
+// Kick kicks a player from the server
+func (s *Server) Kick(p *player.Player, msg string) {
+	pkt.WriteTo(p.Conn)
+	msg = fmt.Sprintf("Player %q was kicked from the server.", p.Name)
+	s.BroadcastMessage(msg)
 }
 
 func serverId() string {
