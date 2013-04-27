@@ -64,6 +64,9 @@ func (s *Server) HandleLogin(sender *player.Player) {
 	// Instantiate all other users on new client
 	s.BroadcastLogin(sender)
 
+	// Save player to server list
+	s.AddPlayer(p)
+
 	// Initialize entity on other player's clients
 	// r = &packet.Entity{sender.Id()}
 	// server.BroadcastPacket(r)

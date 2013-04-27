@@ -135,9 +135,8 @@ func (s *Server) handle(c net.Conn) {
 	defer log.Println("Connection closed:", c.RemoteAddr())
 	log.Println("Got connection from:", c.RemoteAddr())
 
-	// Create player "instance" and save it to player list
+	// Create player "instance", don't save it yet, it may be a ServerList Ping.
 	p := player.New(c)
-	s.AddPlayer(p)
 
 	// Ensure player is deleted from online list, doesn't care about why he/she
 	// disconnects.
