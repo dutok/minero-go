@@ -8,7 +8,6 @@ import (
 
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
-	mct "github.com/toqueteos/minero/types/minecraft"
 )
 
 func (s *Server) HandleLogin(sender *player.Player) {
@@ -51,9 +50,6 @@ func (s *Server) HandleLogin(sender *player.Player) {
 	r.WriteTo(sender.Conn)
 
 	// Send nearby clients new client's info
-	meta := mct.NewMetadata()
-	meta.Entries[0] = &mct.EntryByte{0}
-	_ = meta
 	r = &packet.EntityNamedSpawn{
 		Entity: sender.Id(),
 		Name:   sender.Name,
@@ -61,9 +57,12 @@ func (s *Server) HandleLogin(sender *player.Player) {
 		Yaw:      0.0,
 		Pitch:    0.0,
 		Item:     0,
-		Metadata: mct.MetadataFrom([]byte{0, 0, 6, 0, 127}),
+		Metadata: player.JustLoginMetadata(sender.Name),
 	}
 	s.BroadcastPacket(r)
+
+	// Instantiate all other users on new client
+	s.BroadcastLogin(sender)
 
 	// Initialize entity on other player's clients
 	// r = &packet.Entity{sender.Id()}
