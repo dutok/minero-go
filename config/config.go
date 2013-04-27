@@ -104,7 +104,7 @@ func (c Config) parse() error {
 		// Determine where to save that section
 		switch level {
 		case 0:
-			// First line before this switch
+			// First line after this switch
 		default:
 			if !c.hasRoot(chain, level) {
 				return fmt.Errorf("%s:%d %q at level %d has no root.", c.file, index, key, level)
