@@ -16,7 +16,6 @@ import (
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/list/players"
 	"github.com/toqueteos/minero/server/player"
-	playerl "github.com/toqueteos/minero/server/player/list"
 )
 
 type Server struct {
@@ -61,6 +60,9 @@ func New(c *config.Config) *Server {
 		id:      serverId(),
 		config:  c,
 		privKey: auth.GenerateKeyPair(),
+
+		// Load from config
+		Motd: c.Get("server.motd"),
 
 		PlayersList: players.New(),
 	}
