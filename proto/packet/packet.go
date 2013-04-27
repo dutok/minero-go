@@ -734,7 +734,7 @@ type EntityNamedSpawn struct {
 	X, Y, Z    float64 // Absolute Integer
 	Yaw, Pitch float32 // Packed float
 	Item       int16   // Item currently holding. 0: no item
-	Metadata   *mct.Metadata
+	Metadata   mct.Metadata
 }
 
 func (p EntityNamedSpawn) Id() byte { return 0x14 }
@@ -845,7 +845,7 @@ type SpawnMob struct {
 	X, Y, Z               int32 // Absolute Integer Position of the object
 	Pitch, HeadPitch, Yaw int8  // Yaw in steps of 2p/256
 	VelX, VelY, VelZ      int16
-	Metadata              *mct.Metadata // Varies by mob (see Entities)
+	Metadata              mct.Metadata // Varies by mob (see Entities)
 }
 
 func (p SpawnMob) Id() byte { return 0x18 }
@@ -1279,7 +1279,7 @@ func (p *EntityAttach) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 5 bytes + Metadata
 type EntityMetadata struct {
 	Entity int32
-	Meta   *mct.Metadata // (see Entities)
+	Meta   mct.Metadata // (see Entities)
 }
 
 func (p EntityMetadata) Id() byte { return 0x28 }
