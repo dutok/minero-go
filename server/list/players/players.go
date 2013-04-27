@@ -70,3 +70,25 @@ func (l PlayersList) BroadcastMessage(msg string) {
 	}
 	l.RUnlock()
 }
+
+// BroadcastLogin initializes all previously online clients to a new player.
+func (l PlayersList) BroadcastLogin(to *player.Player) {
+	l.RLock()
+	for _, p := range l.list {
+		if p.Ready {
+			r := &packet.EntityNamedSpawn{
+				Entity:   p.Id(),
+				Name:     p.Name,
+				X:        p.X,
+				Y:        p.Y,
+				Z:        p.Z,
+				Yaw:      p.Yaw,
+				Pitch:    p.Pitch,
+				Item:     0,
+				Metadata: player.JustLoginMetadata(p.Name),
+			}
+			r.WriteTo(to.Conn)
+		}
+	}
+	l.RUnlock()
+}
