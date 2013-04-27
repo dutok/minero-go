@@ -132,12 +132,12 @@ func (rw MustReadWriter) WriteObjectData(w io.Writer, value *mct.ObjectData) {
 	rw.N += n
 }
 
-func (rw MustReadWriter) ReadMetadata(r io.Reader) (res *mct.Metadata) {
+func (rw MustReadWriter) ReadMetadata(r io.Reader) (res mct.Metadata) {
 	if rw.Err != nil {
 		return
 	}
 
-	t := new(mct.Metadata)
+	t := mct.NewMetadata()
 	n, err := t.ReadFrom(r)
 	if err != nil {
 		rw.Err = fmt.Errorf("ReadMetadata: %s", err)
@@ -148,7 +148,7 @@ func (rw MustReadWriter) ReadMetadata(r io.Reader) (res *mct.Metadata) {
 	return t
 }
 
-func (rw MustReadWriter) WriteMetadata(w io.Writer, value *mct.Metadata) {
+func (rw MustReadWriter) WriteMetadata(w io.Writer, value mct.Metadata) {
 	if rw.Err != nil {
 		return
 	}
