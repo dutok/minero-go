@@ -1486,7 +1486,7 @@ func (p *BlockChangeMulti) WriteTo(w io.Writer) (n int64, err error) {
 // Total Size: 13 bytes
 type BlockChange struct {
 	X         int32
-	Y         int8
+	Y         byte
 	Z         int32
 	BlockType int16 // New block type for block
 	BlockMeta int8  // New Metadata for block
@@ -1496,7 +1496,7 @@ func (p BlockChange) Id() byte { return 0x35 }
 func (p *BlockChange) ReadFrom(r io.Reader) (n int64, err error) {
 	var rw MustReadWriter
 	p.X = rw.ReadInt32(r)
-	p.Y = rw.ReadInt8(r)
+	p.Y = byte(rw.ReadInt8(r))
 	p.Z = rw.ReadInt32(r)
 	p.BlockType = rw.ReadInt16(r)
 	p.BlockMeta = rw.ReadInt8(r)
@@ -1509,7 +1509,7 @@ func (p *BlockChange) WriteTo(w io.Writer) (n int64, err error) {
 	id := Id(p.Id())
 	rw.Must(id.WriteTo(w))
 	rw.WriteInt32(w, p.X)
-	rw.WriteInt8(w, p.Y)
+	rw.WriteInt8(w, int8(p.Y))
 	rw.WriteInt32(w, p.Z)
 	rw.WriteInt16(w, p.BlockType)
 	rw.WriteInt8(w, p.BlockMeta)
