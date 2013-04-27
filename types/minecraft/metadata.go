@@ -1,40 +1,39 @@
 package minecraft
 
 import (
-	"encoding/binary"
+	"bytes"
+	"github.com/toqueteos/minero/util/must"
 	"io"
 
 	"github.com/toqueteos/minero/types"
 )
 
-type TypeEntry byte
-
 const (
-	TypeByte TypeEntry = iota
-	TypeShort
-	TypeInt
-	TypeFloat
-	TypeString
-	TypeSlot
-	TypeVector
+	TypeByte   byte = iota // 0: 000
+	TypeShort              // 1: 001
+	TypeInt                // 2: 010
+	TypeFloat              // 3: 011
+	TypeString             // 4: 100
+	TypeSlot               // 5: 101
+	TypeVector             // 6: 110
 )
 
-func (t TypeEntry) New() (e Entry) {
-	switch t {
+func EntryFrom(e byte) (r Entry) {
+	switch e {
 	case 0:
-		e = new(EntryByte)
+		r = new(EntryByte)
 	case 1:
-		e = new(EntryShort)
+		r = new(EntryShort)
 	case 2:
-		e = new(EntryInt)
+		r = new(EntryInt)
 	case 3:
-		e = new(EntryFloat)
+		r = new(EntryFloat)
 	case 4:
-		e = new(EntryString)
+		r = new(EntryString)
 	case 5:
-		e = new(EntrySlot)
+		r = new(EntrySlot)
 	case 6:
-		e = new(EntryVector)
+		r = new(EntryVector)
 	}
 	return
 }
@@ -44,65 +43,68 @@ type Metadata struct {
 }
 
 type Entry interface {
+	Type() byte
 	io.ReaderFrom
 	io.WriterTo
-	Type() byte
-	// Value() []byte
 }
 
-func NewMetadata() *Metadata {
-	return &Metadata{make(map[byte]Entry)}
+func NewMetadata() Metadata {
+	return Metadata{
+		Entries: make(map[byte]Entry),
+	}
 }
 
-func (m *Metadata) ReadFrom(r io.Reader) (n int64, err error) {
-	var (
-		key byte
-		nn  int64
-	)
+func MetadataFrom(s []byte) (m Metadata, err error) {
+	m = NewMetadata()
+	_, err = m.ReadFrom(bytes.NewBuffer(s))
+	return
+}
 
+func (m Metadata) ReadFrom(r io.Reader) (n int64, err error) {
+	var rw must.ReadWriter
+
+	var key byte
 	for key != 0x7f {
-		err = binary.Read(r, binary.BigEndian, &key)
-		if err != nil {
-			return 0, err
-		}
-		n += 1
-
+		// Read type+key
+		key = byte(rw.ReadInt8(r))
 		if key == 0x7f {
 			break
 		}
 
-		typ := TypeEntry(key & 0xE0)
-		index := key & 0x1F
-		value := typ.New()
+		var (
+			typ     byte  = key & 0xE0 >> 5
+			index   byte  = key & 0x1F
+			payload Entry = EntryFrom(typ)
+		)
 
-		nn, err = value.ReadFrom(r)
-		if err != nil {
-			return
-		}
-		n += nn
+		// Read payload
+		rw.Must(payload.ReadFrom(r))
 
-		m.Entries[index] = value
+		m.Entries[index] = payload
 	}
 
-	return
+	return rw.Result()
 }
 
-func (m *Metadata) WriteTo(w io.Writer) (n int64, err error) {
-	var nn int64
-	for _, entry := range m.Entries {
-		nn, err = entry.WriteTo(w)
-		if err != nil {
-			return n, err
-		}
-		n += nn
-	}
-	_, err = w.Write([]byte{0x7F})
-	if err != nil {
-		return n, err
-	}
-	n += 1
+func (m Metadata) WriteTo(w io.Writer) (n int64, err error) {
+	var rw must.ReadWriter
+	var buf bytes.Buffer
 
-	return
+	for index, payload := range m.Entries {
+		buf.Reset()
+		typ := payload.Type()
+		rw.Check(buf.WriteByte(typ<<5 | (index & 0x1F)))
+
+		// Write type+key & payload
+		rw.Must(buf.WriteTo(w))
+		rw.Must(payload.WriteTo(w))
+	}
+
+	buf.Reset()
+	rw.Check(buf.WriteByte(0x7f))
+	rw.Must(buf.WriteTo(w))
+
+	return rw.Result()
 }
 
 type EntryByte struct{ types.Int8 }
@@ -122,41 +124,17 @@ func (e EntrySlot) Type() byte   { return 5 }
 func (e EntryVector) Type() byte { return 6 }
 
 func (e *EntryVector) ReadFrom(r io.Reader) (n int64, err error) {
-	var nn int64
-	nn, err = e.Data[0].ReadFrom(r)
-	if err != nil {
-		return
+	var rw must.ReadWriter
+	for i := 0; i < len(e.Data); i++ {
+		rw.Must(e.Data[i].ReadFrom(r))
 	}
-	n += nn
-	nn, err = e.Data[1].ReadFrom(r)
-	if err != nil {
-		return
-	}
-	n += nn
-	nn, err = e.Data[2].ReadFrom(r)
-	if err != nil {
-		return
-	}
-	n += nn
-	return
+	return rw.Result()
 }
 
 func (e *EntryVector) WriteTo(w io.Writer) (n int64, err error) {
-	var nn int64
-	nn, err = e.Data[0].WriteTo(w)
-	if err != nil {
-		return
+	var rw must.ReadWriter
+	for i := 0; i < len(e.Data); i++ {
+		rw.Must(e.Data[i].WriteTo(w))
 	}
-	n += nn
-	nn, err = e.Data[1].WriteTo(w)
-	if err != nil {
-		return
-	}
-	n += nn
-	nn, err = e.Data[2].WriteTo(w)
-	if err != nil {
-		return
-	}
-	n += nn
-	return
+	return rw.Result()
 }
