@@ -15,5 +15,5 @@ func Handle0C(server *Server, sender *player.Player) {
 		Yaw:    pkt.Yaw,
 		Pitch:  pkt.Pitch,
 	}
-	server.BroadcastOthers(sender, resp)
+	server.BroadcastPacket(resp)
 }

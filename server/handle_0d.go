@@ -34,11 +34,11 @@ func Handle0D(server *Server, sender *player.Player) {
 		Yaw:    pkt.Yaw,
 		Pitch:  pkt.Pitch,
 	}
-	server.BroadcastOthers(sender, p)
+	server.BroadcastPacket(p)
 
 	p = &packet.EntityHeadLook{
 		Entity:  sender.Id(),
 		HeadYaw: pkt.Yaw,
 	}
-	server.BroadcastOthers(sender, p)
+	server.BroadcastPacket(p)
 }

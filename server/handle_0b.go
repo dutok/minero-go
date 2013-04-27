@@ -9,5 +9,5 @@ import (
 func Handle0B(server *Server, sender *player.Player) {
 	pkt := new(packet.PlayerPos)
 	pkt.ReadFrom(sender.Conn)
-	// server.BroadcastOthers(sender, pkt)
+	// server.BroadcastPacket(pkt)
 }

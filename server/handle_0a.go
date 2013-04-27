@@ -11,5 +11,5 @@ func Handle0A(server *Server, sender *player.Player) {
 	pkt.ReadFrom(sender.Conn)
 
 	resp := &packet.Entity{sender.Id()}
-	server.BroadcastOthers(sender, resp)
+	server.BroadcastPacket(resp)
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/toqueteos/minero"
+	"github.com/toqueteos/minero/proto/auth"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
@@ -32,7 +33,7 @@ func Handle02(server *Server, sender *player.Player) {
 		r := packet.EncryptionKeyRequest{
 			ServerId:  server.Id(),
 			PublicKey: server.PublicKey(),
-			Token:     server.Token(),
+			Token:     auth.EncryptionBytes(),
 		}
 		r.WriteTo(sender.Conn)
 		sender.Token = r.Token

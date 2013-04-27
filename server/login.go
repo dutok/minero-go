@@ -61,26 +61,26 @@ func (s *Server) HandleLogin(sender *player.Player) {
 		Yaw:      0.0,
 		Pitch:    0.0,
 		Item:     0,
-		Metadata: []byte{0, 0, 6, 0, 127},
+		Metadata: mct.MetadataFrom([]byte{0, 0, 6, 0, 127}),
 	}
-	s.BroadcastOthers(sender, r)
+	s.BroadcastPacket(r)
 
 	// Initialize entity on other player's clients
 	// r = &packet.Entity{sender.Id()}
-	// server.BroadcastOthers(sender, r)
+	// server.BroadcastPacket(r)
 
 	// Send nearby clients client's Pos & Look
 	// r = &packet.EntityTeleport{
 	// 	Entity: sender.Id(),
 	// 	X:      startX, Y: startY, Z: startZ,
 	// }
-	// s.BroadcastOthers(sender, r)
+	// s.BroadcastPacket(r)
 
 	// r = &packet.EntityHeadLook{
 	// 	Entity:  sender.Id(),
 	// 	HeadYaw: 0.0,
 	// }
-	// s.BroadcastOthers(sender, r)
+	// s.BroadcastPacket(r)
 }
 
 func VirtualChunks(x, z, height int32) packet.Packet {

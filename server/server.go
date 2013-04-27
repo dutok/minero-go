@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"log"
-	prand "math/rand"
+	mrand "math/rand"
 	"net"
 	"sync"
 	"time"
@@ -14,6 +14,7 @@ import (
 	"github.com/toqueteos/minero/config"
 	"github.com/toqueteos/minero/proto/auth"
 	"github.com/toqueteos/minero/proto/packet"
+	"github.com/toqueteos/minero/server/list/players"
 	"github.com/toqueteos/minero/server/player"
 	playerl "github.com/toqueteos/minero/server/player/list"
 )
@@ -34,16 +35,17 @@ type Server struct {
 
 	// Message of the day. Text appears on server list.
 	Motd string
-
 	// Stop message. Text appears on server list.
 	Stop string
 
-	cmdList    map[string]command.Cmder
-	playerList playerl.List
-	// pluginList map[string]*plugin.Plugin
-	// worldList  map[string]*world.World
+	cmdList map[string]command.Cmder
+
+	// Embed list handlers
+	players.PlayersList
 }
 
+// New initializes a new server instance and loads server.conf file if one
+// exists, otherwise it'll create a new one.
 func New(c *config.Config) *Server {
 	log.Println("Generating keypair.")
 
@@ -60,16 +62,18 @@ func New(c *config.Config) *Server {
 		config:  c,
 		privKey: auth.GenerateKeyPair(),
 
-		playerList: playerl.New(),
+		PlayersList: players.New(),
 	}
 
 	return s
 }
 
-func (s Server) Id() string    { return s.id }
-func (s Server) Token() []byte { return auth.EncryptionBytes() }
-func (s Server) CmdManager()   {}
+// Id returns server's Id.
+func (s Server) Id() string { return s.id }
 
+func (s Server) PlayersIn() int { return s.PlayersList.Len() }
+
+// PublicKey returns the ASN.1 encoded version of server's x.509 public key.
 func (s *Server) PublicKey() []byte {
 	if s.pubKey == nil {
 		var err error
@@ -87,6 +91,8 @@ func (s *Server) Decrypt(what []byte) ([]byte, error) {
 	return rsa.DecryptPKCS1v15(rand.Reader, s.privKey, what)
 }
 
+// CheckUser check's if user is premium, only used when config var
+// "server.online_mode" = true.
 func (s *Server) CheckUser(name string, secret []byte) bool {
 	r, err := auth.CheckUser(name, s.id, secret, s.PublicKey())
 	if err != nil {
@@ -95,6 +101,7 @@ func (s *Server) CheckUser(name string, secret []byte) bool {
 	return r
 }
 
+// Run starts up the server.
 func (s *Server) Run() {
 	var err error
 
@@ -117,17 +124,19 @@ func (s *Server) Run() {
 		// Handle the connection in a new goroutine.
 		// The loop then returns to accepting, so that
 		// multiple connections may be served concurrently.
-		go s.Handle(conn)
+		go s.handle(conn)
 	}
 }
 
-func (s *Server) Handle(c net.Conn) {
+func (s *Server) handle(c net.Conn) {
 	defer c.Close()
 	defer log.Println("Connection closed:", c.RemoteAddr())
 	log.Println("Got connection from:", c.RemoteAddr())
 
-	// Create player "instance"
+	// Create player "instance" and save it to player list
 	p := player.New(c)
+	s.AddPlayer(p)
+
 	// Ensure player is deleted from online list, doesn't care about why he/she
 	// disconnects.
 	defer s.RemPlayer(p)
@@ -135,7 +144,7 @@ func (s *Server) Handle(c net.Conn) {
 	// Send KeepAlive packet every 30s (x20 in-game ticks)
 	go func() {
 		for _ = range time.Tick(30 * time.Second) {
-			r := &packet.KeepAlive{RandomId: prand.Int31()}
+			r := &packet.KeepAlive{RandomId: mrand.Int31()}
 			r.WriteTo(p.Conn)
 		}
 	}()
@@ -157,30 +166,6 @@ func (s *Server) Handle(c net.Conn) {
 	}
 }
 
-// BroadcastOthers sends a packet to all online players but p.
-func (s *Server) BroadcastOthers(p *player.Player, pkt packet.Packet) {
-	for _, pl := range s.playerList {
-		if pl.Ready && p.Name != pl.Name {
-			pkt.WriteTo(pl.Conn)
-		}
-	}
-}
-
-// BroadcastMessage send a message to all online players.
-func (s *Server) BroadcastMessage(msg string) {
-	for _, p := range s.playerList {
-		if p.Ready {
-			p.SendMessage(msg)
-		}
-	}
-}
-
-// AddPlayer adds a player to server's player list.
-func (s *Server) AddPlayer(p *player.Player) { s.playerList.Add(p) }
-
-// RemPlayer removes a player from server's player list.
-func (s *Server) RemPlayer(p *player.Player) { s.playerList.Rem(p.Name) }
-
 // Kick kicks a player from the server
 func (s *Server) Kick(p *player.Player) {
 	p.SendMessage("You were kicked from the server.")
@@ -189,5 +174,5 @@ func (s *Server) Kick(p *player.Player) {
 }
 
 func serverId() string {
-	return fmt.Sprintf("minero%x-%d", prand.Int31(), time.Now().Year())
+	return fmt.Sprintf("minero%x-%d", mrand.Int31(), time.Now().Year())
 }

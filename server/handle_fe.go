@@ -21,7 +21,7 @@ func HandleFE(server *Server, sender *player.Player) {
 		return
 	}
 
-	in := fmt.Sprintf("%d", len(server.playerList))
+	in := fmt.Sprintf("%d", server.PlayersIn())
 	max := server.config.Get("server.max_players")
 	resp := ping.Ping(ping.Prepare(server.Motd, in, max))
 	resp.WriteTo(sender.Conn)
