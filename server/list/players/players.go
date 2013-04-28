@@ -21,11 +21,22 @@ func New() PlayersList {
 	}
 }
 
-// Len returns the number of online players
+// Len returns the number of online players.
 func (l PlayersList) Len() int {
 	l.RLock()
 	defer l.RUnlock()
 	return len(l.list)
+}
+
+// Copy returns a copy of the list.
+func (l PlayersList) Copy() map[string]*player.Player {
+	lc := make(map[string]*player.Player)
+	l.RLock()
+	for _, p := range l.list {
+		lc[p.Name] = p
+	}
+	l.RUnlock()
+	return lc
 }
 
 // GetPlayer gets a player from the list by his/her name.
