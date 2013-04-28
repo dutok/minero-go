@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/toqueteos/minero/command"
-	"github.com/toqueteos/minero/command/vanilla"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
@@ -20,19 +19,20 @@ func Handle03(server *Server, sender *player.Player) {
 
 	// Messages prefixed with / are treated like commands
 	if strings.HasPrefix(pkt.Message, "/") {
+		var parts = strings.Fields(pkt.Message[1:])
+		// Empty commands are noops.
+		if len(parts) == 0 {
+			return
+		}
+
 		var (
-			parts            = strings.Fields(pkt.Message[1:])
 			cmdName, cmdArgs = parts[0], parts[1:]
 			cmd              command.Cmder
 			ok               bool
 		)
 
-		switch {
-		case contains(cmdName, server.cmdList):
-			cmd = vanilla.CmdList[cmdName]
-		case contains(cmdName, vanilla.CmdList):
-			cmd = vanilla.CmdList[cmdName]
-		default:
+		// Command not found
+		if cmd, ok = server.cmdList[cmdName]; !ok {
 			msg := fmt.Sprintf("Unknown command %q.", cmdName)
 			log.Println(msg)
 			sender.SendMessage(msg)
