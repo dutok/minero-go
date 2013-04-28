@@ -1,4 +1,4 @@
-// Simple configuration file format.
+// Package config defines a parser and a handler for minero's simple configuration file format.
 //
 // Properties:
 //   - Less verbose than JSON.
