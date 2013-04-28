@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"compress/zlib"
 	"io"
-	"log"
 
+	"github.com/toqueteos/minero/constants/biome"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
@@ -68,50 +68,67 @@ func (s *Server) HandleLogin(sender *player.Player) {
 	s.AddPlayer(sender)
 }
 
+// type Chunk struct {
+// 	Block    [16][16][16][16]byte // 16 sections of 4k each. Order YZX.
+// 	Meta     [16][16][16][8]byte  // 16 sections of 2k each. Order YZX.
+// 	Light    [16][16][16][8]byte  // 16 sections of 2k each. Order YZX.
+// 	SkyLight [16][16][16][8]byte  // 16 sections of 2k each. Order YZX.
+// 	Add      [16][16][16][8]byte  // 16 sections of 2k each. Order YZX.
+// 	Biome    [16][16]byte         // 16 x 16 bytes. Order XZ.
+// }
+
 func VirtualChunks(x, z, height int32) packet.Packet {
 	var temp bytes.Buffer
 	var nul [1 << 11]byte
 
-	temp.Write(bytes.Repeat([]byte{1}, 1<<12))  // Block type. 4k bytes. Order YZX. Stone 1x
-	temp.Write(nul[:])                          // Block metadata. 2k bytes. Zeros
-	temp.Write(nul[:])                          // Block light. 2k bytes. Zeros
-	temp.Write(bytes.Repeat([]byte{12}, 1<<12)) // Block sklylight. 2k bytes.
-	temp.Write(nul[:])                          // Add mask. 2k bytes. Zeros
+	// Block type. 16*4k bytes. Order YZX. Stone.
+	for i := 0; i < sections(height); i++ {
+		temp.Write(bytes.Repeat([]byte{1}, 1<<12)) // 4x4k sections of stone.
+	}
 
-	log.Println("AFTER Repeat:", temp.Len())
+	// Block metadata. 16*2k bytes. Zeros.
+	for i := 0; i < sections(height); i++ {
+		temp.Write(nul[:])
+	}
+	// Block light. 16*2k bytes. Zeros.
+	for i := 0; i < sections(height); i++ {
+		temp.Write(nul[:])
+	}
+	// Block sklylight. 16*2k bytes.
+	for i := 0; i < sections(height); i++ {
+		temp.Write(bytes.Repeat([]byte{0xcc}, 1<<11)) // Light all over the place.
+	}
+	// Add mask. 16*2k bytes. Zeros. Only sent iff Add != 0
+	// for i := 0; i < sections(height); i++ {
+	// 	temp.Write(nul[:])
+	// }
 
-	// Repeat for each section
-	temp.Write(bytes.Repeat(temp.Bytes(), int(sections(height)-1)))
-
-	log.Println("BEFORE Repeat:", temp.Len())
-
-	temp.Write(bytes.Repeat([]byte{1}, 1<<8)) // Biomes. 256 bytes. Plains
-
-	log.Println("BEFORE Repeat + Biomes:", temp.Len())
-
-	log.Println("Sections:", sections(height))
+	// Biomes. 256 bytes. Plains.
+	temp.Write(bytes.Repeat([]byte{biome.Plains}, 1<<8))
 
 	var buf bytes.Buffer
 	zw := zlib.NewWriter(&buf)
 	io.Copy(zw, &temp)
 	zw.Close()
 
-	log.Println("ZLIB chunk size:", buf.Len())
-
 	return &packet.ChunkData{
 		X:              x,
 		Z:              z,
 		AllColSections: true,
-		Primary:        (1 << sections(height)) - 1,
+		Primary:        sectionMask(height),
 		Add:            0,
 		ChunkData:      buf.Bytes(),
 	}
 }
 
-func sections(height int32) uint {
-	s := uint(height / 16)
+func sections(height int32) int {
+	s := int(height / 16)
 	if s == 0 {
 		return 1
 	}
 	return s
+}
+
+func sectionMask(height int32) uint16 {
+	return uint16(1<<uint(sections(height)) - 1)
 }
