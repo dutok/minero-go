@@ -3,6 +3,7 @@ package player
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
@@ -93,5 +94,13 @@ func (p *Player) BroadcastMessage(toList map[string]*Player, message string) {
 		if to.Ready && to.Name != p.Name {
 			to.SendMessage(message)
 		}
+	}
+}
+
+// Tick sends a KeepAlive packet every 800 in-game ticks (40s).
+func (p *Player) Tick(t int64) {
+	if t%800 == 0 {
+		r := &packet.KeepAlive{RandomId: rand.Int31()}
+		r.WriteTo(p.Conn)
 	}
 }
