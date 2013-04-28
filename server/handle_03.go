@@ -48,9 +48,9 @@ func Handle03(server *Server, sender *player.Player) {
 		}
 	}
 
-	// All other messages are sent
+	// Send message to all other players
 	msg := fmt.Sprintf("<%s> %s", sender.Name, pkt.Message)
-	server.BroadcastMessage(msg)
+	sender.BroadcastMessage(server.PlayersList.Copy(), msg)
 }
 
 func contains(cmdName string, list map[string]command.Cmder) (ok bool) {
