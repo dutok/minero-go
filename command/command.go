@@ -1,3 +1,4 @@
+// Package command provides an easily extendable interface to work with chat commands.
 package command
 
 import (
