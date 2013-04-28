@@ -1,4 +1,4 @@
-// Defines important constants such as: latest NMS supported version.
+// Package constants defines server-wide constants such as: latest NMS supported version.
 //
 // Examples: Materials (Block Ids), Potion Types, Inventory Types, Player
 // Actions, etc...
