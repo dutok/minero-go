@@ -65,24 +65,7 @@ func (s *Server) HandleLogin(sender *player.Player) {
 	s.BroadcastLogin(sender)
 
 	// Save player to server list
-	s.AddPlayer(p)
-
-	// Initialize entity on other player's clients
-	// r = &packet.Entity{sender.Id()}
-	// server.BroadcastPacket(r)
-
-	// Send nearby clients client's Pos & Look
-	// r = &packet.EntityTeleport{
-	// 	Entity: sender.Id(),
-	// 	X:      startX, Y: startY, Z: startZ,
-	// }
-	// s.BroadcastPacket(r)
-
-	// r = &packet.EntityHeadLook{
-	// 	Entity:  sender.Id(),
-	// 	HeadYaw: 0.0,
-	// }
-	// s.BroadcastPacket(r)
+	s.AddPlayer(sender)
 }
 
 func VirtualChunks(x, z, height int32) packet.Packet {
