@@ -1,3 +1,11 @@
+// Defines important constants such as: latest NMS supported version.
+//
+// Examples: Materials (Block Ids), Potion Types, Inventory Types, Player
+// Actions, etc...
 package constants
 
-const Server = "1.5"
+const (
+	ProtoNum = 60
+	Proto    = "60"
+	Server   = "1.5.1"
+)

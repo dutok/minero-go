@@ -3,7 +3,7 @@ package ping
 import (
 	"strings"
 
-	"github.com/toqueteos/minero"
+	"github.com/toqueteos/minero/constants"
 	"github.com/toqueteos/minero/proto/packet"
 )
 
@@ -17,7 +17,7 @@ func Ping(s []string) *packet.Disconnect {
 func Prepare(motd, in, max string) []string {
 	return []string{
 		"§1",
-		minero.Proto, minero.Server,
+		constants.Proto, constants.Server,
 		motd,
 		in, max,
 	}

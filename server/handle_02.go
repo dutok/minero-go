@@ -3,7 +3,7 @@ package server
 import (
 	"log"
 
-	"github.com/toqueteos/minero"
+	"github.com/toqueteos/minero/constants"
 	"github.com/toqueteos/minero/proto/auth"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
@@ -16,9 +16,9 @@ func Handle02(server *Server, sender *player.Player) {
 
 	log.Printf("Handshake from: %q [%s]", pkt.Username, sender.RemoteAddr())
 
-	if pkt.Version != minero.ProtoNum {
+	if pkt.Version != constants.ProtoNum {
 		log.Printf("Wrong Protocol version. Player: %d, Server: %d\n",
-			pkt.Version, minero.ProtoNum)
+			pkt.Version, constants.ProtoNum)
 		return
 	}
 
