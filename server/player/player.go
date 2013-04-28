@@ -46,6 +46,17 @@ func (p Player) Id() int32          { return p.eid }
 func (p Player) OnlineSince() int64 { return p.since }
 func (p Player) UsesCrypto() bool   { return p.crypto }
 
+// OnlineMode set's authentication on for p. Authentication is required for
+// online_mode=true servers.
+func (p *Player) OnlineMode(m bool, secret []byte) {
+	p.crypto = m
+	if m {
+		p.Conn = cfb8.New(p.net, secret)
+	}
+}
+
+func (p *Player) SetReady() { p.Lock(); p.Ready = true; p.Unlock() }
+
 func (p *Player) SetPos(x, y, z float64) {
 	p.Lock()
 	p.X = x
@@ -53,6 +64,11 @@ func (p *Player) SetPos(x, y, z float64) {
 	p.Z = z
 	p.Unlock()
 }
+
+func (p *Player) SetX(x float64) { p.Lock(); p.X = x; p.Unlock() }
+func (p *Player) SetY(y float64) { p.Lock(); p.Y = y; p.Unlock() }
+func (p *Player) SetZ(z float64) { p.Lock(); p.Z = z; p.Unlock() }
+
 func (p *Player) SetLook(pitch, yaw float32) {
 	p.Lock()
 	p.Pitch = pitch
@@ -60,20 +76,22 @@ func (p *Player) SetLook(pitch, yaw float32) {
 	p.Unlock()
 }
 
-func (p *Player) SetReady() {
-	p.Lock()
-	p.Ready = true
-	p.Unlock()
-}
+func (p *Player) SetPitch(pitch float32) { p.Lock(); p.Pitch = pitch; p.Unlock() }
+func (p *Player) SetYaw(yaw float32)     { p.Lock(); p.Yaw = yaw; p.Unlock() }
 
-func (p *Player) SendMessage(msg string) {
-	pkt := &packet.ChatMessage{msg}
+// SendMessage sends a chat message to p.
+func (p *Player) SendMessage(message string) {
+	pkt := &packet.ChatMessage{message}
 	pkt.WriteTo(p.Conn)
 }
 
-func (p *Player) OnlineMode(m bool, secret []byte) {
-	p.crypto = m
-	if m {
-		p.Conn = cfb8.New(p.net, secret)
+// BroadcastMessage sends a message to all `ready` players from toList. If p is
+// in that list he/she is ommited.
+func (p *Player) BroadcastMessage(toList map[string]*Player, message string) {
+	for _, to := range toList {
+		// Send message only to other ready players
+		if to.Ready && to.Name != p.Name {
+			to.SendMessage(message)
+		}
 	}
 }
