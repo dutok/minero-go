@@ -1,3 +1,4 @@
+// Package gamemode defines all available game modes and some utility functions.
 package gamemode
 
 const (
