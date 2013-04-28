@@ -13,8 +13,8 @@ import (
 	"github.com/toqueteos/minero/command"
 	"github.com/toqueteos/minero/config"
 	"github.com/toqueteos/minero/proto/auth"
-	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/list/players"
+	"github.com/toqueteos/minero/server/list/tickers"
 	"github.com/toqueteos/minero/server/player"
 )
 
@@ -25,6 +25,8 @@ type Server struct {
 
 	net     net.Listener
 	working bool
+
+	ticks int64
 
 	config *config.Config
 
@@ -41,6 +43,7 @@ type Server struct {
 
 	// Embed list handlers
 	players.PlayersList
+	tickers.TickersList
 }
 
 // New initializes a new server instance and loads server.conf file if one
@@ -65,6 +68,7 @@ func New(c *config.Config) *Server {
 		Motd: c.Get("server.motd"),
 
 		PlayersList: players.New(),
+		TickersList: tickers.New(),
 	}
 
 	return s
@@ -116,6 +120,9 @@ func (s *Server) Run() {
 	}
 	defer s.net.Close()
 
+	// Start server ticker
+	go s.doTick()
+
 	for !s.working {
 		// Wait for a connection.
 		conn, err := s.net.Accept()
@@ -130,6 +137,13 @@ func (s *Server) Run() {
 	}
 }
 
+func (s *Server) doTick() {
+	for _ = range time.Tick(50 * time.Millisecond) {
+		s.TickAll(s.ticks)
+		s.ticks++
+	}
+}
+
 func (s *Server) handle(c net.Conn) {
 	defer c.Close()
 	defer log.Println("Connection closed:", c.RemoteAddr())
@@ -137,18 +151,12 @@ func (s *Server) handle(c net.Conn) {
 
 	// Create player "instance", don't save it yet, it may be a ServerList Ping.
 	p := player.New(c)
+	s.AddTicker(p.Id(), p)
 
 	// Ensure player is deleted from online list, doesn't care about why he/she
 	// disconnects.
+	defer s.RemTicker(p.Id())
 	defer s.RemPlayer(p)
-
-	// Send KeepAlive packet every 30s (x20 in-game ticks)
-	go func() {
-		for _ = range time.Tick(30 * time.Second) {
-			r := &packet.KeepAlive{RandomId: mrand.Int31()}
-			r.WriteTo(p.Conn)
-		}
-	}()
 
 	var buf = make([]byte, 1)
 	for {
