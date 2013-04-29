@@ -105,3 +105,8 @@ func (p *Player) Tick(t int64) {
 		r.WriteTo(p.Conn)
 	}
 }
+
+// Destroy attempts to release all resources allocated by this player.
+func (p *Player) Destroy() {
+	id.Rel(p.Id())
+}
