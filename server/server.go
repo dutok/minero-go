@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/toqueteos/minero/command"
+	"github.com/toqueteos/minero/cmd"
 	"github.com/toqueteos/minero/config"
 	"github.com/toqueteos/minero/proto/auth"
 	"github.com/toqueteos/minero/server/list/players"
@@ -39,11 +39,11 @@ type Server struct {
 	// Stop message. Text appears on server list.
 	Stop string
 
-	cmdList map[string]command.Cmder
+	Cmds map[string]cmd.Cmder
 
 	// Embed list handlers
-	players.PlayersList
-	tickers.TickersList
+	players.Players
+	tickers.Tickers
 }
 
 // New initializes a new server instance and loads server.conf file if one
@@ -67,8 +67,9 @@ func New(c *config.Config) *Server {
 		// Load from config
 		Motd: c.Get("server.motd"),
 
-		PlayersList: players.New(),
-		TickersList: tickers.New(),
+		Cmds:    make(map[string]cmd.Cmder),
+		Players: players.New(),
+		Tickers: tickers.New(),
 	}
 
 	return s

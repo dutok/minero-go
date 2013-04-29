@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/toqueteos/minero/command"
+	"github.com/toqueteos/minero/cmd"
 	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/player"
 )
@@ -25,14 +25,12 @@ func Handle03(server *Server, sender *player.Player) {
 			return
 		}
 
-		var (
-			cmdName, cmdArgs = parts[0], parts[1:]
-			cmd              command.Cmder
-			ok               bool
-		)
+		var cmdName, cmdArgs = parts[0], parts[1:]
+		var cmd cmd.Cmder
+		var ok bool
 
 		// Command not found
-		if cmd, ok = server.cmdList[cmdName]; !ok {
+		if cmd, ok = server.Cmds[cmdName]; !ok {
 			msg := fmt.Sprintf("Unknown command %q.", cmdName)
 			log.Println(msg)
 			sender.SendMessage(msg)
@@ -50,10 +48,10 @@ func Handle03(server *Server, sender *player.Player) {
 
 	// Send message to all other players
 	msg := fmt.Sprintf("<%s> %s", sender.Name, pkt.Message)
-	sender.BroadcastMessage(server.PlayersList.Copy(), msg)
+	sender.BroadcastMessage(server.Players.Copy(), msg)
 }
 
-func contains(cmdName string, list map[string]command.Cmder) (ok bool) {
+func contains(cmdName string, list map[string]cmd.Cmder) (ok bool) {
 	_, ok = list[cmdName]
 	return
 }
