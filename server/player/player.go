@@ -10,6 +10,7 @@ import (
 
 	"github.com/toqueteos/minero/id"
 	"github.com/toqueteos/minero/proto/packet"
+	"github.com/toqueteos/minero/util"
 	"github.com/toqueteos/minero/util/crypto/cfb8"
 )
 
@@ -97,9 +98,9 @@ func (p *Player) BroadcastMessage(toList map[string]*Player, message string) {
 	}
 }
 
-// Tick sends a KeepAlive packet every 800 in-game ticks (40s).
+// Tick sends a KeepAlive packet every 1000 in-game ticks (50s).
 func (p *Player) Tick(t int64) {
-	if t%800 == 0 {
+	if t%util.Ticks(50) == 0 {
 		r := &packet.KeepAlive{RandomId: rand.Int31()}
 		r.WriteTo(p.Conn)
 	}
