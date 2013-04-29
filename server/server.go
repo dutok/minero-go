@@ -11,7 +11,9 @@ import (
 
 	"github.com/toqueteos/minero/cmd"
 	"github.com/toqueteos/minero/config"
+	"github.com/toqueteos/minero/id"
 	"github.com/toqueteos/minero/proto/auth"
+	"github.com/toqueteos/minero/proto/packet"
 	"github.com/toqueteos/minero/server/list/players"
 	"github.com/toqueteos/minero/server/list/tickers"
 	"github.com/toqueteos/minero/server/player"
@@ -32,6 +34,8 @@ type Server struct {
 	privateKey *rsa.PrivateKey
 	publicKey  []byte
 	token      []byte
+
+	gameTime int64
 
 	// Message of the day. Text appears on server list.
 	Motd string
@@ -126,13 +130,23 @@ func (s *Server) Run() {
 		}
 
 		// Handle the connection in a new goroutine.
-		// The loop then returns to accepting, so that
-		// multiple connections may be served concurrently.
+		// Multiple connections may be served concurrently.
 		go s.handle(conn)
 	}
 }
 
+// Tick updates time by one tick. Implements tick.Ticker interface.
+func (s *Server) Tick(t int64) {
+	pkt := &packet.TimeUpdate{
+		Time:     s.gameTime,
+		WorldAge: t,
+	}
+	s.BroadcastPacket(pkt)
+}
+
 func (s *Server) doTick() {
+	// This id *NEVER* gets released
+	s.AddTicker(id.Get(), s)
 	for _ = range time.Tick(50 * time.Millisecond) {
 		s.TickAll(s.ticks)
 		s.ticks++
@@ -150,8 +164,9 @@ func (s *Server) handle(c net.Conn) {
 
 	// Ensure player is deleted from online list, doesn't care about why he/she
 	// disconnects.
-	defer s.RemTicker(p.Id())
+	defer p.Destroy()
 	defer s.RemPlayer(p)
+	defer s.RemTicker(p.Id())
 
 	var buf = make([]byte, 1)
 	for {
