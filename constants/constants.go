@@ -5,7 +5,8 @@
 package constants
 
 const (
-	ProtoNum = 60
-	Proto    = "60"
-	Server   = "1.5.1"
+	Proto          = "60"
+	ProtoNum       = 60
+	Server         = "1.5.1"
+	TicksPerSecond = 20
 )
