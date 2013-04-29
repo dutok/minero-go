@@ -77,8 +77,6 @@ func New(c *config.Config) *Server {
 // Id returns server's Id.
 func (s Server) Id() string { return s.id }
 
-func (s Server) PlayersIn() int { return s.PlayersList.Len() }
-
 // PublicKey returns the ASN.1 encoded version of server's x.509 public key.
 func (s *Server) PublicKey() []byte {
 	if s.pubKey == nil {
