@@ -1,11 +1,10 @@
 package server
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
 	"log"
-	mrand "math/rand"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
@@ -30,18 +29,17 @@ type Server struct {
 
 	config *config.Config
 
-	privKey *rsa.PrivateKey
-	pubKey  []byte
-	token   []byte
+	privateKey *rsa.PrivateKey
+	publicKey  []byte
+	token      []byte
 
 	// Message of the day. Text appears on server list.
 	Motd string
 	// Stop message. Text appears on server list.
 	Stop string
 
-	Cmds map[string]cmd.Cmder
-
 	// Embed list handlers
+	Cmds map[string]cmd.Cmder
 	players.Players
 	tickers.Tickers
 }
@@ -60,9 +58,9 @@ func New(c *config.Config) *Server {
 	}
 
 	s := &Server{
-		id:      serverId(),
-		config:  c,
-		privKey: auth.GenerateKeyPair(),
+		id:         serverId(),
+		config:     c,
+		privateKey: auth.GenerateKeyPair(),
 
 		// Load from config
 		Motd: c.Get("server.motd"),
@@ -80,21 +78,19 @@ func (s Server) Id() string { return s.id }
 
 // PublicKey returns the ASN.1 encoded version of server's x.509 public key.
 func (s *Server) PublicKey() []byte {
-	if s.pubKey == nil {
+	if s.publicKey == nil {
 		var err error
-		s.pubKey = auth.KeyExchange(&s.privKey.PublicKey)
-		if s.pubKey == nil {
+		s.publicKey = auth.KeyExchange(&s.privateKey.PublicKey)
+		if s.publicKey == nil {
 			log.Fatal("Couldn't marshal public key:", err)
 			return nil
 		}
 	}
-	return s.pubKey
+	return s.publicKey
 }
 
-// Decrypt decrypts whatever the client encrypted with its keypair.
-func (s *Server) Decrypt(what []byte) ([]byte, error) {
-	return rsa.DecryptPKCS1v15(rand.Reader, s.privKey, what)
-}
+// PrivateKey returns server's private key.
+func (s *Server) PrivateKey() *rsa.PrivateKey { return s.privateKey }
 
 // CheckUser check's if user is premium, only used when config var
 // "server.online_mode" = true.
@@ -182,5 +178,5 @@ func (s *Server) Kick(p *player.Player) {
 }
 
 func serverId() string {
-	return fmt.Sprintf("minero%x-%d", mrand.Int31(), time.Now().Year())
+	return fmt.Sprintf("minero%x-%d", rand.Int31(), time.Now().Year())
 }

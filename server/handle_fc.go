@@ -2,6 +2,8 @@ package server
 
 import (
 	"bytes"
+	"crypto/rand"
+	"crypto/rsa"
 	"log"
 
 	"github.com/toqueteos/minero/proto/packet"
@@ -16,8 +18,8 @@ func HandleFC(server *Server, sender *player.Player) {
 	// Decrypt shared secret and token with server's private key.
 	var secret, token []byte
 	// var err error
-	secret, _ = server.Decrypt(pkt.Secret)
-	token, _ = server.Decrypt(pkt.Token)
+	secret, _ = rsa.DecryptPKCS1v15(rand.Reader, server.PrivateKey(), pkt.Secret)
+	token, _ = rsa.DecryptPKCS1v15(rand.Reader, server.PrivateKey(), pkt.Token)
 
 	// Ensure token matches
 	if !bytes.Equal(token, sender.Token) {
