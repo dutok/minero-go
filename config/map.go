@@ -67,7 +67,12 @@ func fileOutput(m Map) string {
 
 		// Write kv
 		tabs = strings.Repeat("\t", dots)
-		values = append(values, fmt.Sprintf("%s%s: %s", tabs, key, m[k]))
+		value := m[k]
+		// Empty string marker
+		if value == "" {
+			value = "-"
+		}
+		values = append(values, fmt.Sprintf("%s%s: %s", tabs, key, value))
 	}
 
 	return fmt.Sprintf("%s", strings.Join(values, "\n"))
