@@ -1,10 +1,13 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"strings"
 )
+
+var ErrEmpty = errors.New("Empty config file")
 
 // Config wraps an unexported Map with methods for parsing and type conversion.
 type Config struct {
@@ -52,7 +55,7 @@ func (c Config) Parse(s string) error {
 func (c Config) ParseFile(f string) error {
 	buf, err := ioutil.ReadFile(f)
 	if err != nil {
-		return fmt.Errorf("Couldn't read config file %q.", f)
+		return fmt.Errorf("Couldn't read config file %q", f)
 	}
 	c.file = f
 	c.input = string(buf)
@@ -70,35 +73,41 @@ func (c Config) parse() error {
 		return nil
 	}
 	if c.input == "" {
-		return fmt.Errorf("Empty config file %q.", c.file)
+		return ErrEmpty
 	}
 
 	// Key chain
 	var chain []string
 
-	for index, line := range strings.Split(c.input, "\n") {
-		var (
-			values = strings.SplitN(line, ":", 2)
-			key    = strings.TrimSpace(values[0])
-		)
-
-		// Empty line
-		if len(values) == 1 || strings.HasPrefix(key, "#") {
+	for i, line := range strings.Split(c.input, "\n") {
+		// Empty/Comment line
+		if line == "" || strings.HasPrefix(strings.TrimSpace(line), "#") {
 			continue
 		}
 
 		var (
-			value = strings.TrimSpace(values[1])
-			level = lineLevel(line)
+			level  = lineLevel(line)
+			values = strings.SplitN(line, ":", 2)
+			key    = strings.TrimSpace(values[0])
+			value  = strings.TrimSpace(values[1])
 		)
 
-		// Current value defines new map
-		if value == "" {
+		// Remove comments from value
+		if index := strings.Index(value, "#"); index != -1 {
+			value = strings.TrimSpace(value[:index])
+		}
+
+		// New map marker
+		switch value {
+		case "":
 			if len(chain) != level+1 {
 				chain = append(chain, key)
 			}
 			chain[level] = key
 			continue
+		case "-":
+			// Empty string marker
+			value = ""
 		}
 
 		// Determine where to save that section
@@ -107,7 +116,7 @@ func (c Config) parse() error {
 			// First line after this switch
 		default:
 			if !c.hasRoot(chain, level) {
-				return fmt.Errorf("%s:%d %q at level %d has no root.", c.file, index, key, level)
+				return fmt.Errorf("%s:%d %q at level %d has no root", c.file, i, key, level)
 			}
 
 			// Join all key strings
@@ -126,6 +135,9 @@ func (c Config) parse() error {
 
 // hasRoot ensures a chain of sections exists, linking levels [0, end].
 func (c Config) hasRoot(chain []string, end int) bool {
+	if len(chain) < end {
+		return false
+	}
 	for i := 0; i < end; i++ {
 		if chain[i] == "" {
 			return false
