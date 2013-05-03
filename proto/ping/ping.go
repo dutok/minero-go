@@ -7,8 +7,8 @@ import (
 	"github.com/toqueteos/minero/proto/packet"
 )
 
-// Ping returns a 0xFF packet containing the response to a 0xFE (ServerListPing)
-// packet. For more info check package docs.
+// Ping returns a 0xFF packet ready to be sent (written to an io.Writer) as
+// response to a 0xFE (ServerListPing) packet.
 func Ping(s []string) *packet.Disconnect {
 	return &packet.Disconnect{Reason: strings.Join(s, "\x00")}
 }
