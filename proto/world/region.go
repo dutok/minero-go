@@ -111,6 +111,9 @@ type Section struct {
 	SkyLight   [2048]byte // 4b/block. YZX.
 }
 
+func (s *Section) ReadFrom(r io.Reader) (n int64, err error) { return }
+func (s *Section) WriteTo(w io.Writer) (n int64, err error)  { return }
+
 type Entity struct {
 	Id             string  // Entity ID. Doesn't exist for players.
 	X, Y, Z        float64 // Pos.
@@ -128,13 +131,22 @@ type Entity struct {
 	Riding         *Entity // Entity being ridden. Recursive.
 }
 
+func (e *Entity) ReadFrom(r io.Reader) (n int64, err error) { return }
+func (e *Entity) WriteTo(w io.Writer) (n int64, err error)  { return }
+
 type TileEntity struct {
 	Id      string // Tile entity Id.
 	X, Y, Z int32  // Pos.
 }
+
+func (te *TileEntity) ReadFrom(r io.Reader) (n int64, err error) { return }
+func (te *TileEntity) WriteTo(w io.Writer) (n int64, err error)  { return }
 
 type TileTick struct {
 	Id      int32 // Block Id.
 	Ticks   int32 // Ticks until processing. Iff Ticks < 0: overdue.
 	X, Y, Z int32 // Pos.
 }
+
+func (tt *TileTick) ReadFrom(r io.Reader) (n int64, err error) { return }
+func (tt *TileTick) WriteTo(w io.Writer) (n int64, err error)  { return }
