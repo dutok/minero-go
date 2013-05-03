@@ -91,7 +91,7 @@ type Chunk struct {
 	LastUpdate       int64        `LastUpdate`       // Tick when the chunk was last saved.
 	TerrainPopulated bool         `TerrainPopulated` // false=NMC resets world.
 	Biomes           [256]byte    `Biomes`           // -1=NMC reset biome.
-	SkyLight         [256]int32   `HeightMap`        // Lowest Y light is at full strength. ZX.
+	HeightMap        [256]int32   `HeightMap`        // Lowest Y light is at full strength. ZX.
 	Sections         [16]*Section `Sections`         // 16x16x16 blocks.
 	Entities         []Entity     `Entities`         // List of NBT Compound.
 	TileEntities     []TileEntity `TileEntities`     // List of NBT Compound.
