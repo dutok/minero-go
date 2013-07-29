@@ -1,3 +1,19 @@
+IMPORTANTE NOTE
+===============
+
+I've seen some activity related to minero so I'm adding this little note to README.
+
+Project is *NOT ACTIVE* anymore until further notice.
+
+- **Why?** I have less time now to tinker with this project also Mojang is taking like forever to remake Minecraft properly from scratch so there are piles and piles of shit in the server code I must reimplement again and I refuse to do that.
+- **Will that change?** If they remake the game properly I'll continue with minero; until then project read second line of this section.
+
+If you want to contact me you can try any of these:
+1. Create a new issue here
+2. Drop me an email on: `toqueteos at gmail dot com`.
+
+If you are still interested in Go + Minecraft check this out: http://github.com/NetherrackDev
+
 Minero
 ======
 
@@ -10,11 +26,13 @@ Requirements
 
 Just Go, also Git (encouraged) if you want to use `go get`.
 
-More specifically aimed for: `go version go1.0.3`.
+More specifically aimed for: `go version go1.0.3`. 
 
 You can check your Go version typing `go version` on the terminal. If it outputs an error you don't have Go installed.
 
 Go to [Go's install page](http://golang.org/doc/install) **Download the Go tools** section and follow the instructions.
+
+**NOTE:** It should work with newer versions of Go, go1.1.1 right now.
 
 Features
 ========
@@ -23,6 +41,8 @@ Features
 - NBT v19133 support.
 - Proxy with logging support available.
 - Server list ping client & server (ping other servers, fake a server).
+
+**NOTE:** Right now the server allows client to log in, move and do most actions but any changes on map aren't saved.
 
 Tools
 =====
