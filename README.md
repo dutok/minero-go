@@ -6,7 +6,7 @@ I've seen some activity related to minero so I'm adding this little note to READ
 Project is *NOT ACTIVE* anymore until further notice.
 
 - **Why?** I have less time now to tinker with this project also Mojang is taking like forever to remake Minecraft properly from scratch so there are piles and piles of shit in the server code I must reimplement again and I refuse to do that.
-- **Will that change?** If they remake the game properly I'll continue with minero; until then project read second line of this section.
+- **Will that change?** If they remake the game properly I'll continue with minero.
 
 If you want to contact me you can try any of these:
 1. Create a new issue here
