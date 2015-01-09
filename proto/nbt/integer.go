@@ -3,7 +3,7 @@ package nbt
 import (
 	"fmt"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/types"
 )
 
 // Byte holds a single signed byte.

@@ -6,8 +6,8 @@ import (
 	"crypto/rsa"
 	"log"
 
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // HandleFC handles incoming requests of packet 0xFC: EncryptionKeyResponse

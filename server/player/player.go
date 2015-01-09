@@ -8,10 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/toqueteos/minero/id"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/util"
-	"github.com/toqueteos/minero/util/crypto/cfb8"
+	"github.com/minero/minero/id"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/util"
+	"github.com/minero/minero/util/crypto/cfb8"
 )
 
 type Player struct {

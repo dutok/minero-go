@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/server/player"
 )
 
 const (

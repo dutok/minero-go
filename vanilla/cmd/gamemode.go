@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 type Gamemode struct{}

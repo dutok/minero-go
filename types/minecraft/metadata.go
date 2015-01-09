@@ -2,10 +2,11 @@ package minecraft
 
 import (
 	"bytes"
-	"github.com/toqueteos/minero/util/must"
 	"io"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/util/must"
+
+	"github.com/minero/minero/types"
 )
 
 const (

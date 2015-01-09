@@ -3,7 +3,7 @@ package chat_test
 import (
 	"fmt"
 
-	"github.com/toqueteos/minero/chat"
+	"github.com/minero/minero/chat"
 )
 
 func ExampleTranslate() {

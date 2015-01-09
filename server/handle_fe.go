@@ -3,9 +3,9 @@ package server
 import (
 	"fmt"
 
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/proto/ping"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/proto/ping"
+	"github.com/minero/minero/server/player"
 )
 
 // HandleFE handles incoming requests of packet 0xFE: ServerListPing

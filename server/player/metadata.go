@@ -1,7 +1,7 @@
 package player
 
 import (
-	mct "github.com/toqueteos/minero/types/minecraft"
+	mct "github.com/minero/minero/types/minecraft"
 )
 
 // JustLoginMetadata return default metadata for players who just got in.

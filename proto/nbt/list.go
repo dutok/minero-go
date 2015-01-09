@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/types"
 )
 
 // List holds a list of nameless tags, all of the same type. The list is

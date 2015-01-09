@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // HandleFF handles incoming requests of packet 0xFF: Disconnect

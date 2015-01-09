@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/toqueteos/minero/cmd"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/cmd"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // Handle03 handles incoming requests of packet 0x03: ChatMessage

@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing/iotest"
 
-	"github.com/toqueteos/minero/proto/nbt"
+	"github.com/minero/minero/proto/nbt"
 )
 
 func init() {

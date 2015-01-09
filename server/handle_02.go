@@ -3,10 +3,10 @@ package server
 import (
 	"log"
 
-	"github.com/toqueteos/minero/constants"
-	"github.com/toqueteos/minero/proto/auth"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/constants"
+	"github.com/minero/minero/proto/auth"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // Handle02 handles incoming requests of packet 0x02: Handshake

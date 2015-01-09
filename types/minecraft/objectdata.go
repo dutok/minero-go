@@ -3,7 +3,7 @@ package minecraft
 import (
 	"io"
 
-	"github.com/toqueteos/minero/util/must"
+	"github.com/minero/minero/util/must"
 )
 
 // ObjectData is a special data type for packet 0x17.

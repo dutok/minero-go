@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"io"
 
-	mct "github.com/toqueteos/minero/types/minecraft"
-	"github.com/toqueteos/minero/util/abs"
+	mct "github.com/minero/minero/types/minecraft"
+	"github.com/minero/minero/util/abs"
 )
 
 type Packet interface {

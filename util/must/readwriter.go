@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/types"
 )
 
 // ReadWriter keeps a counter of bytes read or write when dealing with

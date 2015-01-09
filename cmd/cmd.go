@@ -2,7 +2,7 @@
 package cmd
 
 import (
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/server/player"
 )
 
 type Cmder interface {

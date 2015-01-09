@@ -5,8 +5,8 @@ import (
 	"compress/gzip"
 	"io"
 
-	"github.com/toqueteos/minero/proto/nbt"
-	"github.com/toqueteos/minero/util/must"
+	"github.com/minero/minero/proto/nbt"
+	"github.com/minero/minero/util/must"
 )
 
 // Slot

@@ -2,7 +2,7 @@
 package util
 
 import (
-	"github.com/toqueteos/minero/constants"
+	"github.com/minero/minero/constants"
 )
 
 // Ticks translates s seconds to in-game ticks. Usually s * 20.

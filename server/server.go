@@ -9,14 +9,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/toqueteos/minero/cmd"
-	"github.com/toqueteos/minero/config"
-	"github.com/toqueteos/minero/id"
-	"github.com/toqueteos/minero/proto/auth"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/list/players"
-	"github.com/toqueteos/minero/server/list/tickers"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/cmd"
+	"github.com/minero/minero/config"
+	"github.com/minero/minero/id"
+	"github.com/minero/minero/proto/auth"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/list/players"
+	"github.com/minero/minero/server/list/tickers"
+	"github.com/minero/minero/server/player"
 )
 
 type Server struct {

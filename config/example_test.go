@@ -3,7 +3,7 @@ package config_test
 import (
 	"fmt"
 
-	"github.com/toqueteos/minero/config"
+	"github.com/minero/minero/config"
 )
 
 func ExamplePrettyMap() {

@@ -4,7 +4,7 @@ package tickers
 import (
 	"sync"
 
-	"github.com/toqueteos/minero/server/tick"
+	"github.com/minero/minero/server/tick"
 )
 
 // Tickers is a simple goroutine-safe ticker list.

@@ -7,7 +7,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/toqueteos/minero/proto/packet"
+	"github.com/minero/minero/proto/packet"
 )
 
 func Client(addr string) {

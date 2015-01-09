@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 
-	"github.com/toqueteos/minero/server"
+	"github.com/minero/minero/server"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package nbt
 import (
 	"fmt"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/types"
 )
 
 // Float holds a single IEEE-754 single-precision floating point number.

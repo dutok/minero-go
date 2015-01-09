@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/toqueteos/minero/types"
+	"github.com/minero/minero/types"
 )
 
 func NewByteArray(s []int8) *ByteArray {

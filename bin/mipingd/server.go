@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/proto/ping"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/proto/ping"
 )
 
 func Server(addr string) {

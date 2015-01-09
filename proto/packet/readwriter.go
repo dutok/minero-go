@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	mct "github.com/toqueteos/minero/types/minecraft"
-	"github.com/toqueteos/minero/util/must"
+	mct "github.com/minero/minero/types/minecraft"
+	"github.com/minero/minero/util/must"
 )
 
 // MustReadWriter handles error handling while reading common types present in

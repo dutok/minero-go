@@ -3,9 +3,9 @@ package server
 import (
 	"log"
 
-	"github.com/toqueteos/minero/material"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/material"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // Handle0F handles incoming requests of packet 0x0F: PlayerBlockPlace

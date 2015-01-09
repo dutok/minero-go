@@ -5,9 +5,9 @@ import (
 	"compress/zlib"
 	"io"
 
-	"github.com/toqueteos/minero/constants/biome"
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/constants/biome"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 func (s *Server) HandleLogin(sender *player.Player) {

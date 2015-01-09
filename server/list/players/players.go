@@ -4,8 +4,8 @@ package players
 import (
 	"sync"
 
-	"github.com/toqueteos/minero/proto/packet"
-	"github.com/toqueteos/minero/server/player"
+	"github.com/minero/minero/proto/packet"
+	"github.com/minero/minero/server/player"
 )
 
 // Players is a simple goroutine-safe player list.

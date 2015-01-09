@@ -3,8 +3,8 @@ package ping
 import (
 	"strings"
 
-	"github.com/toqueteos/minero/constants"
-	"github.com/toqueteos/minero/proto/packet"
+	"github.com/minero/minero/constants"
+	"github.com/minero/minero/proto/packet"
 )
 
 // Ping returns a 0xFF packet ready to be sent (written to an io.Writer) as

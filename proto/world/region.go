@@ -5,7 +5,7 @@ import (
 	"compress/zlib"
 	"io"
 
-	"github.com/toqueteos/minero/util/must"
+	"github.com/minero/minero/util/must"
 )
 
 const (
