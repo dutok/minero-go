@@ -1,4 +1,4 @@
-IMPORTANTE NOTE
+IMPORTANT NOTE
 ===============
 
 I've seen some activity related to minero so I'm adding this little note to README.
