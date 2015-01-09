@@ -19,7 +19,7 @@ Minero
 
 Minero is an implementation of the Multiplayer Server for [Minecraft](http://minecraft.net) made in [Go](http://golang.org). It aims to fully support Minecraft 1.5.1 version.
 
-It is licensed under the MIT open source license, please read the [LICENSE.txt](https://github.com/toqueteos/minero/blob/master/LICENSE.txt) file for more information.
+It is licensed under the MIT open source license, please read the [LICENSE.txt](https://github.com/minero/minero/blob/master/LICENSE.txt) file for more information.
 
 Requirements
 ============
@@ -37,7 +37,7 @@ Go to [Go's install page](http://golang.org/doc/install) **Download the Go tools
 Features
 ========
 
-- Basic [data types](http://wiki.vg/Data_Types) support (bool, byte, short, int, long, float, double and string). See [`types`](https://github.com/toqueteos/minero/blob/master/types), [`types/nbt`](https://github.com/toqueteos/minero/blob/master/types/nbt) and [`types/minecraft`](https://github.com/toqueteos/minero/blob/master/types/minecraft).
+- Basic [data types](http://wiki.vg/Data_Types) support (bool, byte, short, int, long, float, double and string). See [`types`](https://github.com/minero/minero/blob/master/types), [`types/nbt`](https://github.com/minero/minero/blob/master/types/nbt) and [`types/minecraft`](https://github.com/minero/minero/blob/master/types/minecraft).
 - NBT v19133 support.
 - Proxy with logging support available.
 - Server list ping client & server (ping other servers, fake a server).
@@ -46,21 +46,21 @@ Features
 
 Tools
 =====
-- Minero server: [`bin/minero`](https://github.com/toqueteos/minero/blob/master/bin/minero)
+- Minero server: [`bin/minero`](https://github.com/minero/minero/blob/master/bin/minero)
 
-        go get github.com/toqueteos/minero/bin/minero
+        go get github.com/minero/minero/bin/minero
 
-- NBT pretty printer: [`bin/minbtd`](https://github.com/toqueteos/minero/blob/master/bin/minbtd)
+- NBT pretty printer: [`bin/minbtd`](https://github.com/minero/minero/blob/master/bin/minbtd)
 
-        go get github.com/toqueteos/minero/bin/minbtd
+        go get github.com/minero/minero/bin/minbtd
 
-- Server proxy with logging support: [`bin/miproxy`](https://github.com/toqueteos/minero/blob/master/bin/miproxy)
+- Server proxy with logging support: [`bin/miproxy`](https://github.com/minero/minero/blob/master/bin/miproxy)
 
-        go get github.com/toqueteos/minero/bin/miproxy
+        go get github.com/minero/minero/bin/miproxy
 
-- Server list ping client & server: [`bin/mipingd`](https://github.com/toqueteos/minero/blob/master/bin/mipingd)
+- Server list ping client & server: [`bin/mipingd`](https://github.com/minero/minero/blob/master/bin/mipingd)
 
-        go get github.com/toqueteos/minero/bin/mipingd
+        go get github.com/minero/minero/bin/mipingd
 
 Notes
 =====
