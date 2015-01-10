@@ -1,7 +1,7 @@
 IMPORTANT NOTE
 ===============
 
-I've seen some activity related to minero so I'm adding this little note to README.
+[![GoDoc](https://godoc.org/github.com/minero/minero?status.svg)](https://godoc.org/github.com/minero/minero)
 
 Project is *NOT ACTIVE* anymore until further notice.
 
@@ -9,6 +9,7 @@ Project is *NOT ACTIVE* anymore until further notice.
 - **Will that change?** If they remake the game properly I'll continue with minero.
 
 If you want to contact me you can try any of these:
+
 1. Create a new issue here
 2. Drop me an email on: `toqueteos at gmail dot com`.
 
